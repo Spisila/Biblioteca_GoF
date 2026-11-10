@@ -1,0 +1,60 @@
+@startuml
+skinparam Monochrome true
+
+actor AtorGerente
+participant TratadorDeCadastro
+participant GrupoDePessoas
+participant Pessoa
+
+AtorGerente -> TratadorDeCadastro : inserirPessoa(nome, sobrenome, cpf)
+activate TratadorDeCadastro
+TratadorDeCadastro -> GrupoDePessoas : inserirPessoa(nome, sobrenome, cpf)
+activate GrupoDePessoas
+GrupoDePessoas -> GrupoDePessoas : buscarPorCpf(cpf)
+GrupoDePessoas -> GrupoDePessoas : gerarId()
+create Pessoa
+GrupoDePessoas --> Pessoa : <<create>> Pessoa(id, nome, sobrenome, cpf)
+GrupoDePessoas --> TratadorDeCadastro : boolean
+deactivate GrupoDePessoas
+TratadorDeCadastro --> AtorGerente : boolean
+deactivate TratadorDeCadastro
+
+AtorGerente -> TratadorDeCadastro : consultarPessoa(id)
+activate TratadorDeCadastro
+TratadorDeCadastro -> GrupoDePessoas : consultarPessoa(id)
+activate GrupoDePessoas
+GrupoDePessoas -> Pessoa : consultar()
+activate Pessoa
+Pessoa --> GrupoDePessoas : Pessoa
+deactivate Pessoa
+GrupoDePessoas --> TratadorDeCadastro : Pessoa
+deactivate GrupoDePessoas
+TratadorDeCadastro --> AtorGerente : Pessoa
+deactivate TratadorDeCadastro
+
+AtorGerente -> TratadorDeCadastro : atualizarPessoa(id, nova_pessoa)
+activate TratadorDeCadastro
+TratadorDeCadastro -> GrupoDePessoas : atualizarPessoa(id, nova_pessoa)
+activate GrupoDePessoas
+GrupoDePessoas -> Pessoa : atualizar(nova_pessoa)
+activate Pessoa
+Pessoa --> GrupoDePessoas : Pessoa
+deactivate Pessoa
+GrupoDePessoas --> TratadorDeCadastro : boolean
+deactivate GrupoDePessoas
+TratadorDeCadastro --> AtorGerente : boolean
+deactivate TratadorDeCadastro
+
+AtorGerente -> TratadorDeCadastro : excluirPessoa(id)
+activate TratadorDeCadastro
+TratadorDeCadastro -> GrupoDePessoas : excluirPessoa(id)
+activate GrupoDePessoas
+GrupoDePessoas -> Pessoa : remover()
+activate Pessoa
+Pessoa --> GrupoDePessoas : void
+deactivate Pessoa
+GrupoDePessoas --> TratadorDeCadastro : boolean
+deactivate GrupoDePessoas
+TratadorDeCadastro --> AtorGerente : boolean
+deactivate TratadorDeCadastro
+@enduml

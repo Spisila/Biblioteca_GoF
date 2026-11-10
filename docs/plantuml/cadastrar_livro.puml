@@ -1,0 +1,16 @@
+@startuml
+skinparam Monochrome true
+
+start
+:Receber formulario Novo Livro;
+:Checar livro cadastrado;
+
+if (Livro cadastrado?) then [não]
+  :novo_livro : Livro\n[LIVRE]\n{create};
+  :Inserir livro;
+else [sim]
+  :Mostrar dados do livro;
+endif
+
+stop
+@enduml

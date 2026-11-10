@@ -1,0 +1,38 @@
+@startuml
+skinparam Monochrome true
+
+start
+:Devolver livro;
+:Registrar devolução;
+:devolvido : Livro\n[DEVOLVIDO]\n{update};
+
+fork
+  :Inspecionar exemplar;
+  if (Estado do exemplar?) then (bom estado)
+    :atualizar estado\ndevolvido : Livro\n[LIVRE]\n{update};
+  elseif (danificado reparavel?) then (sim)
+    :Enviar para reparo;
+    :devolvido : Livro\n[REPARANDO]\n{update};
+    :Registrar livro reparado;
+    :atualizar estado\ndevolvido : Livro\n[LIVRE]\n{update};
+  else (irreparavel)
+    :Enviar para incineração;
+    :devolvido : Livro\n[INCINERADO]\n{update};
+  endif
+fork again
+  :Verificar dia\nde devolução;
+  if (Devolução atrasada?) then (sim)
+    :Calcular multa\ndias de atraso;
+    :Solicitar emissão\nde multa;
+    :multa : Multa\n{create};
+    :Buscar estudante\npor CPF;
+    :pessoa_estudante : Pessoa\n{read};
+    :Emitir boleto de multa\n{create};
+    :boleto : Boleto\n[EMITIDO];
+    :Enviar boleto por e-mail;
+  else (no prazo)
+  endif
+end fork
+
+stop
+@enduml

@@ -1,0 +1,24 @@
+@startuml
+skinparam Monochrome true
+
+start
+:Solicitar reserva de livro;
+:Checar se livro cadastrado;
+
+if (Livro cadastrado?) then (não)
+  :Retornar Erro\nLivro não cadastrado;
+else (sim)
+  :Checar status livro;
+  if (Status == LIVRE?) then (não)
+    :livro : Livro\n{read};
+    :Retornar Erro\nLivro não está livre para reserva;
+  else (sim)
+    :livro : Livro\n[LIVRE]\n{read};
+    :Inserir Reserva;
+    :reserva : Reserva\n{create};
+    :/ atualizar status;
+  endif
+endif
+
+stop
+@enduml

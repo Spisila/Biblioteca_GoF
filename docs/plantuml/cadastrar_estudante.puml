@@ -1,0 +1,21 @@
+@startuml
+skinparam Monochrome true
+
+start
+:Receber formulario Novo Estudante;
+:Checar Pessoa existe;
+
+if (Pessoa existe?) then (não)
+  :Retornar erro de pessoa\nnão cadastrada;
+else (sim)
+  :Checar Estudante existe;
+  if (Estudante existe?) then (sim)
+    :Mostrar dados de\nestudante existente;
+  else (não)
+    :novo_estudante : Estudante\n{create};
+    :Inserir Estudante;
+  endif
+endif
+
+stop
+@enduml

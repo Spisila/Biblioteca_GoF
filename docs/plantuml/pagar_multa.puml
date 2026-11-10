@@ -1,0 +1,12 @@
+@startuml
+skinparam Monochrome true
+
+start
+:Pagar boleto;
+:Confirmar pagamento;
+:boleto : Boleto\n[PAGO]\n{update};
+:/ setQuitada;
+:multa : Multa\n{update};
+
+stop
+@enduml

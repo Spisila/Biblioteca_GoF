@@ -1,0 +1,72 @@
+@startuml
+skinparam Monochrome true
+
+actor AtorGerente
+participant TratadorDeCadastro
+participant GrupoDeAcademicos
+participant GrupoDePessoas
+participant Estudante
+
+AtorGerente -> TratadorDeCadastro : inserirEstudante(id_pessoa)
+activate TratadorDeCadastro
+TratadorDeCadastro -> GrupoDeAcademicos : inserirEstudante(id_pessoa)
+activate GrupoDeAcademicos
+GrupoDeAcademicos -> GrupoDePessoas : consultarPessoa(id)
+activate GrupoDePessoas
+GrupoDePessoas --> GrupoDeAcademicos : Pessoa
+deactivate GrupoDePessoas
+GrupoDeAcademicos -> GrupoDeAcademicos : gerarMatricula()
+create Estudante
+GrupoDeAcademicos --> Estudante : <<create>> Estudante()
+GrupoDeAcademicos --> TratadorDeCadastro : boolean
+deactivate GrupoDeAcademicos
+TratadorDeCadastro --> AtorGerente : boolean
+deactivate TratadorDeCadastro
+
+AtorGerente -> TratadorDeCadastro : consultarEstudante(matricula)
+activate TratadorDeCadastro
+TratadorDeCadastro -> GrupoDeAcademicos : consultarEstudante(matricula)
+activate GrupoDeAcademicos
+GrupoDeAcademicos -> Estudante : consultar()
+activate Estudante
+Estudante --> GrupoDeAcademicos : Estudante
+deactivate Estudante
+GrupoDeAcademicos --> TratadorDeCadastro : Estudante
+deactivate GrupoDeAcademicos
+TratadorDeCadastro --> AtorGerente : Estudante
+deactivate TratadorDeCadastro
+
+AtorGerente -> TratadorDeCadastro : atualizarEstudante(matricula, novo_estudante)
+activate TratadorDeCadastro
+TratadorDeCadastro -> GrupoDeAcademicos : atualizarEstudante(matricula, novo_estudante)
+activate GrupoDeAcademicos
+GrupoDeAcademicos -> Estudante : consultarEstudante(matricula)
+activate Estudante
+Estudante --> GrupoDeAcademicos : Estudante
+deactivate Estudante
+GrupoDeAcademicos -> Estudante : atualizar(novo_estudante)
+activate Estudante
+Estudante --> GrupoDeAcademicos : boolean
+deactivate Estudante
+GrupoDeAcademicos --> TratadorDeCadastro : boolean
+deactivate GrupoDeAcademicos
+TratadorDeCadastro --> AtorGerente : boolean
+deactivate TratadorDeCadastro
+
+AtorGerente -> TratadorDeCadastro : excluirEstudante(matricula)
+activate TratadorDeCadastro
+TratadorDeCadastro -> GrupoDeAcademicos : excluirEstudante(matricula)
+activate GrupoDeAcademicos
+GrupoDeAcademicos -> Estudante : consultarEstudante(matricula)
+activate Estudante
+Estudante --> GrupoDeAcademicos : Estudante
+deactivate Estudante
+GrupoDeAcademicos -> Estudante : remover()
+activate Estudante
+Estudante --> GrupoDeAcademicos : boolean
+deactivate Estudante
+GrupoDeAcademicos --> TratadorDeCadastro : boolean
+deactivate GrupoDeAcademicos
+TratadorDeCadastro --> AtorGerente : boolean
+deactivate TratadorDeCadastro
+@enduml

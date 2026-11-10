@@ -1,0 +1,21 @@
+@startuml
+skinparam Monochrome true
+
+start
+:Receber formulario Novo Atendente;
+:Checar pessoa existe;
+
+if (Pessoa existe?) then (não)
+  :Retornar Erro Pessoa\nnão existe;
+else (sim)
+  :Checar Atendente existe;
+  if (Atendente existe?) then (sim)
+    :Mostrar dados de\natendente existente;
+  else (não)
+    :novo_atendente : Atendente\n{create};
+    :Inserir Atendente;
+  endif
+endif
+
+stop
+@enduml

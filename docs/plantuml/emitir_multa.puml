@@ -1,0 +1,20 @@
+@startuml
+skinparam Monochrome true
+
+actor AtorAtendente
+participant TratadorDeDevolucao
+participant Movimentacao
+
+AtorAtendente -> TratadorDeDevolucao : emitirBoletoDeMulta(id_livro, id_estudante, dias_atraso)
+activate TratadorDeDevolucao
+TratadorDeDevolucao -> Movimentacao : buscarEmprestimo(id_livro, id_estudante)
+activate Movimentacao
+Movimentacao --> TratadorDeDevolucao : Emprestimo
+deactivate Movimentacao
+
+TratadorDeDevolucao -> TratadorDeDevolucao : calcularMulta(dias_atraso)
+TratadorDeDevolucao -> TratadorDeDevolucao : gerarBoletoEEnviarEmail(valor)
+
+TratadorDeDevolucao --> AtorAtendente : boolean
+deactivate TratadorDeDevolucao
+@enduml

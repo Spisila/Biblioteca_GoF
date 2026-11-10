@@ -1,0 +1,16 @@
+@startuml
+skinparam Monochrome true
+
+start
+:Receber Formulario Nova Pessoa;
+:Checar Pessoa existe;
+
+if (pessoa não cadastrada?) then (sim)
+  :nova_pessoa : Pessoa\n{create};
+  :Inserir pessoa;
+else (não / já cadastrada)
+  :Mostrar dados da Pessoa;
+endif
+
+stop
+@enduml

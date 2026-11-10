@@ -1,0 +1,365 @@
+
+@startuml
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide empty members
+
+' =========================
+' ENUMERAÇÕES
+' =========================
+
+enum LivroEstado {
+  DISPONIVEL
+  EMPRESTADO
+  RESERVADO
+  EM_REPARO
+  INDISPONIVEL
+}
+
+enum BoletoEstado {
+  EM_ABERTO
+  PAGO
+  VENCIDO
+  CANCELADO
+}
+
+' =========================
+' CLASSES PRINCIPAIS
+' =========================
+
+class Emprestimo {
+  -dataVencimento : Date
+  -numRenovacoes : int
+  +getDataVencimento() : Date
+  +renovarDataVencimento() : void
+  +getNumRenovacoes() : int
+}
+
+class TratadorDeDevolucao {
+  +registrarDevolucao(id_livro : String, id_estudante : String, dias_atraso : int) : boolean
+  +emitirBoletoDeMulta(id_livro : String, id_estudante : String, dias_atraso : int) : boolean
+  +enviarParaReparo(id_livro : String) : void
+  +retornarDoReparo(id_livro : String) : void
+  +inspecionarLivro(id_livro : String) : LivroEstado
+}
+
+class TratadorDeEmprestimo {
+  +realizarEmprestimo(id_livro : String, id_estudante : String) : boolean
+  +solicitarReserva(id_livro : String, id_estudante : String) : boolean
+  +renovarEmprestimo(id_livro : String, id_estudante : String) : boolean
+  +consultarReserva(id_livro : String, id_estudante : String) : Reserva
+}
+
+class Pessoa {
+  -id : String
+  -nome : String
+  -sobrenome : String
+  -cpf : String
+  +getID() : String
+  +getNome() : String
+  +getSobrenome() : String
+  +getCPF() : String
+  +adicionar() : String
+  +consultar() : Pessoa
+  +atualizar(nova : Pessoa) : Pessoa
+  +remover() : void
+}
+
+abstract class Papel {
+  -id : String
+  +getPessoa() : Pessoa
+}
+
+abstract class Transacao {
+  -idTransacao : String
+  -dataTransacao : Date
+  +getIdTransacao() : String
+  +getDataTransacao() : Date
+}
+
+class Estudante {
+  -matricula : String
+  +getMatricula() : String
+  +adicionar() : void
+  +consultar() : Estudante
+  +atualizar(novo : Estudante) : boolean
+  +remover() : boolean
+}
+
+class Administrador {
+  -codigoAdministrador : String
+  +getCodigoAdministrador() : String
+}
+
+class Atendente {
+  -codigo_funcional : String
+  +getCodigoFuncional() : String
+  +adicionar() : void
+  +consultar() : Atendente
+  +atualizar(novo : Atendente) : boolean
+  +remover() : boolean
+}
+
+class Livro {
+  -id : String
+  -titulo : String
+  -status : LivroEstado
+  +getTitulo() : String
+  +getStatus() : LivroEstado
+  +setStatus(estado : LivroEstado) : void
+  +adicionar() : boolean
+  +consultar() : Livro
+  +atualizar(novo : Livro) : boolean
+  +remover() : boolean
+}
+
+class Devolucao {
+  -dataDevolucao : Date
+  -diasAtraso : int
+  +getDataDevolucao() : Date
+  +setDataDevolucao(data : Date) : void
+}
+
+class Reserva {
+  -dataValidade : Date
+  +getDataValidade() : Date
+}
+
+class Multa {
+  -valorMulta : double
+  -quitada : boolean
+  +getValorMulta() : double
+  +setValorMulta(novo_valor : double) : boolean
+  +setQuitada(quitada : boolean) : void
+}
+
+class Boleto {
+  -status : BoletoEstado
+  -codigo : String
+  -dataEmissao : Date
+  -dataVencimento : Date
+  -valor : double
+  +getStatus() : BoletoEstado
+  +setStatus(novo_status : BoletoEstado) : boolean
+}
+
+' =========================
+' GRUPOS E REPOSITÓRIOS
+' =========================
+
+class GrupoDeAcademicos {
+  -estudantes : List<Estudante>
+  +inserirEstudante(id_pessoa : String) : boolean
+  +consultarEstudante(matricula : String) : Estudante
+  +atualizarEstudante(matricula : String, novo_estudante : Estudante) : boolean
+  +excluirEstudante(matricula : String) : boolean
+  +buscarPorMatricula(mat : String) : Estudante
+  +gerarMatricula() : String
+}
+
+class Acervo {
+  -livros : List<Livro>
+  +inserirLivro(l : Livro) : boolean
+  +consultarLivro(id : String) : Livro
+  +atualizarLivro(id : String, novo : Livro) : boolean
+  +removerLivro(id : String) : boolean
+  +buscarPorId(id : String) : Livro
+  +buscarPorTitulo(titulo : String) : Livro
+}
+
+class GrupoDePessoas {
+  -pessoas : List<Pessoa>
+  +inserirPessoa(nome : String, sobrenome : String, cpf : String) : boolean
+  +consultarPessoa(id : String) : Pessoa
+  +atualizarPessoa(id : String, nova_pessoa : Pessoa) : boolean
+  +excluirPessoa(id : String) : boolean
+  +buscarPorCpf(cpf : String) : Pessoa
+  +listar() : List<Pessoa>
+  +gerarId() : String
+}
+
+class Movimentacao {
+  -transacoes : List<Transacao>
+  +registrarTransacao(t : Transacao) : void
+  +removerTransacao(t : Transacao) : void
+  +limparHistorico() : void
+  +checarReserva(matricula : String, id_livro : String) : Reserva
+  +buscarEmprestimo(id_livro : String, id_estudante : String) : Emprestimo
+}
+
+class GrupoDeColaboradores {
+  -atendentes : List<Atendente>
+  +inserirAtendente(p : Pessoa) : boolean
+  +consultarAtendente(codigo : String) : Atendente
+  +atualizarAtendente(codigo : String, novo : Atendente) : boolean
+  +excluirAtendente(codigo : String) : boolean
+  +gerarCodigoFuncional() : String
+}
+
+' =========================
+' INTERFACES
+' =========================
+
+interface iLivro {
+  +inserirLivro(titulo : String, estado : String) : boolean
+  +consultarLivro(id_livro : String) : Livro
+  +atualizarLivro(id_livro : String, novo_livro : Livro) : boolean
+  +excluirLivro(id_livro : String) : boolean
+}
+
+interface iPessoa {
+  +inserirPessoa(nome : String, sobrenome : String, cpf : String) : boolean
+  +consultarPessoa(id : String) : Pessoa
+  +atualizarPessoa(id : String, nova_pessoa : Pessoa) : boolean
+  +excluirPessoa(id : String) : boolean
+}
+
+interface iEstudante {
+  +inserirEstudante(id_pessoa : String) : boolean
+  +consultarEstudante(matricula : String) : Estudante
+  +atualizarEstudante(matricula : String, novo_estudante : Estudante) : boolean
+  +excluirEstudante(matricula : String) : boolean
+}
+
+interface iAtendente {
+  +inserirAtendente(id_pessoa : String) : boolean
+  +consultarAtendente(codigo_funcional : String) : Atendente
+  +atualizarAtendente(codigo_funcional : String, novo_atendente : Atendente) : boolean
+  +excluirAtendente(codigo_funcional : String) : boolean
+}
+
+interface iEmprestimo {
+  +realizarEmprestimo(id_livro : String, id_estudante : String) : boolean
+  +renovarEmprestimo(id_livro : String, id_estudante : String) : boolean
+  +solicitarReserva(id_livro : String, id_estudante : String) : boolean
+  +consultarReserva(id_livro : String, id_estudante : String) : Reserva
+}
+
+interface iDevolucao {
+  +registrarDevolucao(id_livro : String, id_estudante : String, dias_atraso : int) : boolean
+  +emitirBoletoDeMulta(id_livro : String, id_estudante : String, dias_atraso : int) : boolean
+  +enviarParaReparo(id_livro : String) : void
+  +retornarDoReparo(id_livro : String) : void
+  +inspecionarLivro(id_livro : String) : LivroEstado
+}
+
+interface iMulta {
+  +emitirBoletoDeMulta(id_livro : String, id_estudante : String, dias_atraso : int) : boolean
+  +calcularMulta(dias_atraso : int) : double
+}
+
+interface iQuitacao {
+  +registrarQuitacao(id_boleto : String) : boolean
+}
+
+interface iCobranca {
+  +registrarCobranca(id_boleto : String, valor : double) : boolean
+}
+
+' =========================
+' TRATADORES
+' =========================
+
+class TratadorDePessoa {
+  +inserirPessoa(nome : String, sobrenome : String, cpf : String) : boolean
+  +consultarPessoa(id : String) : Pessoa
+  +atualizarPessoa(id : String, nova_pessoa : Pessoa) : boolean
+  +excluirPessoa(id : String) : boolean
+}
+
+class TratadorDeAcervo {
+  +inserirLivro(titulo : String, estado : String) : boolean
+  +consultarLivro(id_livro : String) : Livro
+  +atualizarLivro(id_livro : String, novo_livro : Livro) : boolean
+  +excluirLivro(id_livro : String) : boolean
+}
+
+class TratadorDeEstudante {
+  +inserirEstudante(id_pessoa : String) : boolean
+  +consultarEstudante(matricula : String) : Estudante
+  +atualizarEstudante(matricula : String, novo_estudante : Estudante) : boolean
+  +excluirEstudante(matricula : String) : boolean
+}
+
+class TratadorDeAtendente {
+  +inserirAtendente(id_pessoa : String) : boolean
+  +consultarAtendente(codigo_funcional : String) : Atendente
+  +atualizarAtendente(codigo_funcional : String, novo_atendente : Atendente) : boolean
+  +excluirAtendente(codigo_funcional : String) : boolean
+}
+
+class TratadorDeMulta {
+  +emitirBoletoDeMulta(id_livro : String, id_estudante : String, dias_atraso : int) : boolean
+  +calcularMulta(dias_atraso : int) : double
+  +gerarBoletoEEnviarEmail(valor : double) : boolean
+  +registrarQuitacao(id_boleto : String) : boolean
+}
+
+' =========================
+' HERANÇA
+' =========================
+
+Papel <|-- Atendente
+Papel <|-- Administrador
+Papel <|-- Estudante
+
+Transacao <|-- Reserva
+Transacao <|-- Emprestimo
+Transacao <|-- Devolucao
+
+' =========================
+' ASSOCIAÇÕES
+' =========================
+
+GrupoDePessoas "1" o-- "0..*" Pessoa
+Pessoa "1" -- "0..*" Papel
+
+GrupoDeAcademicos "1" o-- "0..*" Estudante
+GrupoDeColaboradores "1" o-- "0..*" Atendente
+
+Acervo "1" *-- "0..*" Livro
+
+Movimentacao "1" o-- "0..*" Transacao
+
+Transacao "0..*" -- "1" Livro
+Estudante "1" -- "0..*" Transacao
+Atendente "1" -- "0..*" Transacao
+
+Devolucao "1" -- "0..1" Multa
+Multa "1" -- "1..*" Boleto
+
+LivroEstado -- Livro
+BoletoEstado -- Boleto
+
+' =========================
+' RELACIONAMENTOS COM TRATADORES
+' =========================
+
+Administrador "1" -- "1" TratadorDePessoa
+Administrador "1" -- "1" TratadorDeEstudante
+Administrador "1" -- "1" TratadorDeAtendente
+Administrador "1" -- "1" TratadorDeAcervo
+
+Estudante "1" -- "1" TratadorDeEmprestimo
+Atendente "1" -- "1" TratadorDeDevolucao
+
+' =========================
+' IMPLEMENTAÇÃO DE INTERFACES
+' =========================
+
+TratadorDePessoa ..|> iPessoa
+TratadorDeAtendente ..|> iAtendente
+TratadorDeAcervo ..|> iLivro
+TratadorDeEstudante ..|> iEstudante
+TratadorDeEmprestimo ..|> iEmprestimo
+TratadorDeDevolucao ..|> iDevolucao
+TratadorDeMulta ..|> iMulta
+TratadorDeMulta ..|> iQuitacao
+
+note right of iCobranca
+  iCobranca é implementada
+  pelo banco.
+end note
+
+@enduml

@@ -1,0 +1,34 @@
+@startuml
+skinparam Monochrome true
+
+actor AtorEstudante
+participant TratadorDeEmprestimo
+participant Movimentacao
+participant Livro
+participant Emprestimo
+
+AtorEstudante -> TratadorDeEmprestimo : renovarEmprestimo(id_livro, id_estudante)
+activate TratadorDeEmprestimo
+TratadorDeEmprestimo -> Movimentacao : buscarEmprestimo(id_livro, id_estudante)
+activate Movimentacao
+Movimentacao --> TratadorDeEmprestimo : Emprestimo
+deactivate Movimentacao
+
+TratadorDeEmprestimo -> Livro : getEstado()
+activate Livro
+Livro --> TratadorDeEmprestimo : String
+deactivate Livro
+
+TratadorDeEmprestimo -> Livro : setEstado(estado)
+activate Livro
+Livro --> TratadorDeEmprestimo : void
+deactivate Livro
+
+TratadorDeEmprestimo -> Emprestimo : renovarDataDevolucao()
+activate Emprestimo
+Emprestimo --> TratadorDeEmprestimo : void
+deactivate Emprestimo
+
+TratadorDeEmprestimo --> AtorEstudante : boolean
+deactivate TratadorDeEmprestimo
+@enduml

@@ -1,0 +1,64 @@
+@startuml
+skinparam Monochrome true
+
+actor AtorGerente
+participant TratadorDeCadastro
+participant GrupoDeColaboradores
+participant GrupoDePessoas
+participant Atendente
+
+AtorGerente -> TratadorDeCadastro : inserirAtendente(id_pessoa)
+activate TratadorDeCadastro
+TratadorDeCadastro -> GrupoDeColaboradores : inserirAtendente(p)
+activate GrupoDeColaboradores
+GrupoDeColaboradores -> GrupoDePessoas : consultarPessoa(id)
+activate GrupoDePessoas
+GrupoDePessoas --> GrupoDeColaboradores : Pessoa
+deactivate GrupoDePessoas
+GrupoDeColaboradores -> GrupoDeColaboradores : gerarCodigoFuncional()
+create Atendente
+GrupoDeColaboradores --> Atendente : <<create>> Atendente()
+GrupoDeColaboradores --> TratadorDeCadastro : boolean
+deactivate GrupoDeColaboradores
+TratadorDeCadastro --> AtorGerente : boolean
+deactivate TratadorDeCadastro
+
+AtorGerente -> TratadorDeCadastro : consultarAtendente(codigo_funcional)
+activate TratadorDeCadastro
+TratadorDeCadastro -> GrupoDeColaboradores : consultarAtendente(codigo)
+activate GrupoDeColaboradores
+GrupoDeColaboradores -> Atendente : consultar()
+activate Atendente
+Atendente --> GrupoDeColaboradores : Atendente
+deactivate Atendente
+GrupoDeColaboradores --> TratadorDeCadastro : Atendente
+deactivate GrupoDeColaboradores
+TratadorDeCadastro --> AtorGerente : Atendente
+deactivate TratadorDeCadastro
+
+AtorGerente -> TratadorDeCadastro : atualizarAtendente(codigo_funcional, novo_atendente)
+activate TratadorDeCadastro
+TratadorDeCadastro -> GrupoDeColaboradores : atualizarAtendente(codigo, novo_atendente)
+activate GrupoDeColaboradores
+GrupoDeColaboradores -> Atendente : atualizar(novo_atendente)
+activate Atendente
+Atendente --> GrupoDeColaboradores : boolean
+deactivate Atendente
+GrupoDeColaboradores --> TratadorDeCadastro : boolean
+deactivate GrupoDeColaboradores
+TratadorDeCadastro --> AtorGerente : boolean
+deactivate TratadorDeCadastro
+
+AtorGerente -> TratadorDeCadastro : excluirAtendente(codigo_funcional)
+activate TratadorDeCadastro
+TratadorDeCadastro -> GrupoDeColaboradores : excluirAtendente(codigo)
+activate GrupoDeColaboradores
+GrupoDeColaboradores -> Atendente : remover()
+activate Atendente
+Atendente --> GrupoDeColaboradores : boolean
+deactivate Atendente
+GrupoDeColaboradores --> TratadorDeCadastro : boolean
+deactivate GrupoDeColaboradores
+TratadorDeCadastro --> AtorGerente : boolean
+deactivate TratadorDeCadastro
+@enduml

@@ -1,0 +1,28 @@
+@startuml
+skinparam Monochrome true
+
+start
+:Solicitar renovação;
+:Checar livro emprestado;
+
+if (Status é EMPRESTADO ou RENOVADO?) then (não)
+  :Retornar erro\nLivro não Emprestado ou Renovado;
+else (sim)
+  :livro_3 : Livro\n[EMPRESTADO ou RENOVADO]\n{read};
+  if (Estudante é o dono do empréstimo?) then (não)
+    :Retornar erro\nLivro pertence a outro estudante;
+  else (sim)
+    :Checar quantidade\nde renovações;
+    if (Renovações >= 2?) then (sim)
+      :Retornar erro\nLimite de renovações atingido;
+    else (não)
+      :/ atualizar status;
+      :livro_3 : Livro\n[RENOVADO]\n{update};
+      :/ data_vencimento += 30\nnumRenovacoes++;
+      :livro_3 : Livro\n{update};
+    endif
+  endif
+endif
+
+stop
+@enduml

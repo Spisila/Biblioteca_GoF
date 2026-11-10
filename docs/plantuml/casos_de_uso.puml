@@ -1,0 +1,59 @@
+@startuml
+skinparam Monochrome true
+left to right direction
+
+actor "AtorEstudante" as Estudante
+actor "AtorAtendente" as Atendente
+actor "AtorGerente" as Gerente
+
+rectangle Sistema {
+  usecase "ConsultarReservas" as UC1
+  usecase "RenovarEmprestimos" as UC2
+  usecase "SolicitarReserva" as UC3
+  usecase "EfetivarEmprestimo" as UC4
+  usecase "ConsultarAcervo" as UC5
+  
+  usecase "RegistrarRenovacaoEmprestimo" as UC6
+  usecase "RegistrarDevolucao" as UC7
+  usecase "EmitirBoletoMulta" as UC8
+  usecase "ConsultarMovimentacoes" as UC9
+  usecase "RegistrarNovaReserva" as UC10
+  
+  usecase "ConsultarGrupoAcademicos" as UC11
+  usecase "ConsultarGrupoDePessoas" as UC12
+  usecase "ConsultarGrupoColaboradores" as UC13
+  
+  usecase "ManterEstudante" as UC14
+  usecase "ManterPessoa" as UC15
+  usecase "ManterLivro" as UC16
+  usecase "ManterAtendente" as UC17
+}
+
+Estudante --> UC1
+Estudante --> UC2
+Estudante --> UC3
+Estudante --> UC4
+UC3 ..> UC5 : <<include>>
+UC4 ..> UC5 : <<include>>
+
+Atendente --> UC6
+Atendente --> UC7
+Atendente --> UC8
+Atendente --> UC9
+Atendente --> UC10
+UC6 ..> UC7 : <<include>>
+UC7 ..> UC8 : <<extend>>
+UC9 ..> UC10 : <<include>>
+
+Gerente --> UC11
+Gerente --> UC12
+Gerente --> UC13
+Gerente --> UC14
+Gerente --> UC15
+Gerente --> UC16
+Gerente --> UC17
+UC11 ..> UC14 : <<include>>
+UC12 ..> UC15 : <<include>>
+UC13 ..> UC17 : <<include>>
+UC16 ..> UC5 : <<include>>
+@enduml

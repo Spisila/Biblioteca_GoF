@@ -1,0 +1,32 @@
+@startuml
+skinparam Monochrome true
+
+actor AtorAtendente
+participant TratadorDeDevolucao
+participant Movimentacao
+participant Devolucao
+participant Livro
+
+AtorAtendente -> TratadorDeDevolucao : registrarDevolucao(id_livro, id_estudante, dias_atraso)
+activate TratadorDeDevolucao
+TratadorDeDevolucao -> Movimentacao : buscarEmprestimo(id_livro, id_estudante)
+activate Movimentacao
+Movimentacao --> TratadorDeDevolucao : Emprestimo
+deactivate Movimentacao
+
+create Devolucao
+TratadorDeDevolucao --> Devolucao : <<create>> Devolucao()
+
+TratadorDeDevolucao -> Movimentacao : registrarTransacao(t)
+activate Movimentacao
+Movimentacao --> TratadorDeDevolucao : void
+deactivate Movimentacao
+
+TratadorDeDevolucao -> Livro : setEstado(estado)
+activate Livro
+Livro --> TratadorDeDevolucao : void
+deactivate Livro
+
+TratadorDeDevolucao --> AtorAtendente : boolean
+deactivate TratadorDeDevolucao
+@enduml

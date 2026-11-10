@@ -1,0 +1,26 @@
+@startuml
+skinparam Monochrome true
+
+start
+:Solicitar emprestimo;
+:Verificar sistema;
+:Checar livro reservado;
+
+if (Status == RESERVADO?) then (não)
+  :Retornar mensagem de erro\nEstudante não tem reserva;
+  :Informar estudante sobre\nfalta de reserva;
+else (sim)
+  :livro_2 : Livro\n[RESERVADO]\n{read};
+  if (Estudante é o mesmo da reserva?) then (não)
+    :Retornar mensagem de erro\nLivro reservado por outro estudante;
+    :Informar estudante livro\nreservado por outro;
+  else (sim)
+    :/ atualizar status;
+    :livro_2 : Livro\n[EMPRESTADO]\n{update};
+    :Pegar e entregar\nlivro a estudante;
+    :Receber livro;
+  endif
+endif
+
+stop
+@enduml
