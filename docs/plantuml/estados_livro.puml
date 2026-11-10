@@ -1,36 +1,37 @@
 @startuml
-skinparam Monochrome true
+hide empty description
+title stm EstadosLivro
 
-actor AtorEstudante
-participant TratadorDeEmprestimo
-participant Movimentacao
-participant Livro
-participant Emprestimo
+[*] --> LIVRE : inserirLivro
+LIVRE --> [*] : excluirLivro
+LIVRE --> RESERVADO : solicitarReserva
+LIVRE --> REPARANDO : enviarParaReparo [dano identificado no acervo]
 
-AtorEstudante -> TratadorDeEmprestimo : realizarEmprestimo(id_livro, id_estudante)
-activate TratadorDeEmprestimo
-TratadorDeEmprestimo -> Movimentacao : checarReserva(matricula, id_livro)
-activate Movimentacao
-Movimentacao --> TratadorDeEmprestimo : Reserva
-deactivate Movimentacao
+RESERVADO --> EMPRESTADO : realizarEmprestimo [reserva registrada para o mesmo estudante]
 
-create Emprestimo
-TratadorDeEmprestimo --> Emprestimo : <<create>> Emprestimo()
-TratadorDeEmprestimo -> Livro : setEstado(estado)
-activate Livro
-Livro --> TratadorDeEmprestimo : void
-deactivate Livro
+EMPRESTADO --> RENOVADO : renovarEmprestimo [numRenovacoes = 0]
+RENOVADO --> RENOVADO : renovarEmprestimo [numRenovacoes < 2]
 
-TratadorDeEmprestimo -> Movimentacao : removerTransacao(t)
-activate Movimentacao
-Movimentacao --> TratadorDeEmprestimo : void
-deactivate Movimentacao
+EMPRESTADO --> DEVOLVIDO : registrarDevolucao [dataAtual > dataVencimento] / calcularMulta(diasAtraso)
+EMPRESTADO --> DEVOLVIDO : registrarDevolucao [dataAtual <= dataVencimento]
+RENOVADO --> DEVOLVIDO : registrarDevolucao [dataAtual > dataVencimento] / calcularMulta(diasAtraso)
+RENOVADO --> DEVOLVIDO : registrarDevolucao [dataAtual <= dataVencimento]
 
-TratadorDeEmprestimo -> Movimentacao : registrarTransacao(t)
-activate Movimentacao
-Movimentacao --> TratadorDeEmprestimo : void
-deactivate Movimentacao
+DEVOLVIDO --> LIVRE : inspecionarLivro [livro em bom estado]
+DEVOLVIDO --> REPARANDO : inspecionarLivro [danificado reparavel]
+DEVOLVIDO --> INCINERADO : inspecionarLivro [irreparavel]
 
-TratadorDeEmprestimo --> AtorEstudante : boolean
-deactivate TratadorDeEmprestimo
+REPARANDO --> LIVRE : retornarDoReparo
+REPARANDO --> INCINERADO : laudoIrrecuperavel
+
+INCINERADO --> [*]
+
+RENOVADO : entry / numRenovacoes++, dataVencimento += 30
+DEVOLVIDO : entry / setDataDevolucao
+
+note right of REPARANDO
+  A transição laudoIrrecuperavel foi
+  acrescentada pelo enunciado do trabalho
+  (não estava no diagrama original).
+end note
 @enduml
