@@ -1,0 +1,55 @@
+@startuml
+skinparam Monochrome true
+
+interface EstadoLivro {
+  +situacao()
+  +solicitarReserva(livro, idEstudante)
+  +realizarEmprestimo(livro, emprestimo)
+  +renovarEmprestimo(livro, emprestimo)
+  +registrarDevolucao(livro, emprestimo, dataDevolucao)
+  +inspecionarLivro(livro, resultado)
+  +enviarParaReparo(livro, danoIdentificado)
+  +retornarDoReparo(livro)
+  +registrarLaudoIrrecuperavel(livro)
+  +excluirLivro(livro)
+}
+
+abstract class EstadoLivroBase
+class EstadoLivre
+class EstadoReservado
+class EstadoEmprestado
+class EstadoRenovado
+class EstadoDevolvido
+class EstadoReparando
+class EstadoIncinerado
+
+class Livro {
+  -id
+  -titulo
+  -estado
+  -reservadoPara
+  -dataDevolucao
+  +situacao()
+  +eventos(...)
+}
+
+EstadoLivro <|.. EstadoLivroBase
+EstadoLivroBase <|-- EstadoLivre
+EstadoLivroBase <|-- EstadoReservado
+EstadoLivroBase <|-- EstadoEmprestado
+EstadoLivroBase <|-- EstadoRenovado
+EstadoLivroBase <|-- EstadoDevolvido
+EstadoLivroBase <|-- EstadoReparando
+EstadoLivroBase <|-- EstadoIncinerado
+Livro *-- EstadoLivro
+Livro ..> Emprestimo
+
+class Emprestimo {
+  -idLivro
+  -idEstudante
+  -dataVencimento
+  -numRenovacoes
+  +renovar()
+  +diasDeAtraso(dataDevolucao)
+}
+@enduml
