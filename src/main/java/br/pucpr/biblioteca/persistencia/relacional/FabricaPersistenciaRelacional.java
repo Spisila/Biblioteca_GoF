@@ -12,9 +12,27 @@ import br.pucpr.biblioteca.persistencia.fabrica.UnidadeDeTrabalho;
  * <p>Padrão: R08 Abstract Factory — papel: Fábrica concreta.</p>
  */
 public final class FabricaPersistenciaRelacional implements FabricaPersistencia {
+    private final String url;
+    private final String usuario;
+    private final String senha;
+
+    public FabricaPersistenciaRelacional() {
+        this.url = null;
+        this.usuario = null;
+        this.senha = null;
+    }
+
+    public FabricaPersistenciaRelacional(String url, String usuario, String senha) {
+        this.url = url;
+        this.usuario = usuario;
+        this.senha = senha;
+    }
+
     @Override
     public UnidadeDeTrabalhoRelacional criarUnidadeDeTrabalho() {
-        return new UnidadeDeTrabalhoRelacional();
+        return url == null
+                ? new UnidadeDeTrabalhoRelacional()
+                : new UnidadeDeTrabalhoRelacional(url, usuario, senha);
     }
 
     @Override
