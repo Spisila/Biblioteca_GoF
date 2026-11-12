@@ -6,4 +6,5 @@
 | R08 | Abstract Factory | `FabricaPersistencia` (Fábrica abstrata); `FabricaPersistenciaMemoria`, `FabricaPersistenciaRelacional` (Fábricas concretas); `UnidadeDeTrabalho`, `RepositorioLivro`, `RepositorioMovimentacao`, `RepositorioRelacionamento` (Produtos abstratos); produtos `*Memoria` e `*Relacional` (Produtos concretos) | `R08_FabricaPersistenciaTest` |
 | R02 | Strategy | `EmissorMulta` (Contexto); `PoliticaMulta` (Estratégia abstrata); `PoliticaOriginal`, `PoliticaComTeto`, `PoliticaComTolerancia` (Estratégias concretas); `Multa` (registro do valor e da política aplicada) | `R02_PoliticasMultaTest` |
 | R07 | Template Method | `TemplateCadastro` (Classe abstrata); `CadastroLivro`, `CadastroPessoa`, `CadastroEstudante`, `CadastroAtendente` (Subclasses concretas); `RepositorioCadastro` e `RegistroCadastravel` (apoio aos cadastros ainda não modelados) | `R07_TemplateCadastroTest` |
+| R03 | Adapter | `Cobranca` (Alvo); `AdaptadorBancoA`, `AdaptadorBancoB` (Adaptadores concretos); `BancoASimulado`, `BancoBSimulado` (Adaptees); `ServicoCobranca` (cliente do contrato) | `R03_AdaptadorBancoTest` |
 
