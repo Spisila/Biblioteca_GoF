@@ -2,6 +2,7 @@ package br.pucpr.biblioteca.circulacao.facade;
 
 import br.pucpr.biblioteca.biblioteca.livro.Livro;
 import br.pucpr.biblioteca.biblioteca.movimentacao.Emprestimo;
+import br.pucpr.biblioteca.biblioteca.relacionamento.Reserva;
 import br.pucpr.biblioteca.comum.excecoes.NaoEncontradoException;
 import br.pucpr.biblioteca.comum.relogio.Relogio;
 import br.pucpr.biblioteca.persistencia.fabrica.FabricaPersistencia;
@@ -32,6 +33,25 @@ public final class FachadaCirculacao {
 
     public FachadaCirculacao(FabricaPersistencia fabricaPersistencia) {
         this(fabricaPersistencia, new br.pucpr.biblioteca.comum.relogio.RelogioSistema());
+    }
+
+    public Livro solicitarReserva(String idReserva, String idLivro, String idEstudante) {
+        return solicitarReserva(idReserva, idLivro, idEstudante, relogio.hoje());
+    }
+
+    public Livro solicitarReserva(
+            String idReserva,
+            String idLivro,
+            String idEstudante,
+            LocalDate dataReserva) {
+        return emTransacao(repositorios -> {
+            Livro livro = buscarLivro(repositorios.livros(), idLivro);
+            livro.solicitarReserva(idEstudante);
+            repositorios.livros().salvar(livro);
+            repositorios.relacionamentos().salvarReserva(
+                    new Reserva(idReserva, idLivro, idEstudante, dataReserva));
+            return livro;
+        });
     }
 
     /**

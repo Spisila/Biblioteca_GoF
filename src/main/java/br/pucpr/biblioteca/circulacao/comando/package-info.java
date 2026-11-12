@@ -1,3 +1,3 @@
-/** Solicitações e executor de comandos de circulação (R6). */
+/** Solicitações e executor de comandos idempotentes de circulação (R06). */
 package br.pucpr.biblioteca.circulacao.comando;
 
