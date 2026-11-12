@@ -11,4 +11,5 @@
 | R04 | Facade | `FachadaCirculacao` (Fachada); `RepositorioLivro`, `RepositorioMovimentacao`, `RepositorioRelacionamento`, `UnidadeDeTrabalho` (subsistemas coordenados) | `R04_FachadaCirculacaoTest` |
 | R06 | Command | `Comando` (Comando); `ComandoReserva`, `ComandoRenovacao` (Comandos concretos); `ExecutorComando` (Invocador) | `R06_ComandoIdempotenteTest` |
 | R09 | Decorator | `ServicoConsulta` (Componente); `ServicoConsultaOriginal` (Componente concreto); `DecoratorConsulta` (Decorator abstrato); `DecoratorCache`, `DecoratorMedicao` (Decorators concretos); `MetadadosLivro` (metadados) | `R09_DecoratorConsultaTest` |
+| R10 | Composite | `ElementoAcervo` (Componente); `ItemAcervo` (Folha); `GrupoAcervo`, `SecaoAcervo`, `UnidadeAcervo` (Composites) | `R10_CompositeAcervoTest` |
 
