@@ -6,6 +6,7 @@ import br.pucpr.biblioteca.biblioteca.livro.SituacaoLivro;
 import br.pucpr.biblioteca.biblioteca.movimentacao.Emprestimo;
 import br.pucpr.biblioteca.comum.excecoes.OperacaoRecusadaException;
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * Implementa a recusa padrão dos eventos não permitidos.
@@ -18,6 +19,12 @@ public abstract class EstadoLivroBase implements EstadoLivro {
     protected final void recusar(String evento) {
         throw new OperacaoRecusadaException(
                 "Evento " + evento + " não é aceito no estado " + situacaoAtual());
+    }
+
+    protected static void validarEmprestimo(Livro livro, Emprestimo emprestimo) {
+        if (emprestimo == null || !Objects.equals(emprestimo.idLivro(), livro.id())) {
+            throw new OperacaoRecusadaException("Emprestimo nao pertence ao livro");
+        }
     }
 
     @Override

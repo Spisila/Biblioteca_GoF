@@ -20,7 +20,7 @@ public final class EstadoRenovado extends EstadoLivroBase {
 
     @Override
     public void renovarEmprestimo(Livro livro, Emprestimo emprestimo) {
-        EstadoEmprestado.validarEmprestimo(livro, emprestimo);
+        validarEmprestimo(livro, emprestimo);
         if (emprestimo.numRenovacoes() >= Emprestimo.LIMITE_RENOVACOES) {
             throw new OperacaoRecusadaException("Limite de renovacoes atingido");
         }
@@ -30,7 +30,7 @@ public final class EstadoRenovado extends EstadoLivroBase {
 
     @Override
     public void registrarDevolucao(Livro livro, Emprestimo emprestimo, LocalDate dataDevolucao) {
-        EstadoEmprestado.validarEmprestimo(livro, emprestimo);
+        validarEmprestimo(livro, emprestimo);
         Objects.requireNonNull(dataDevolucao, "dataDevolucao nao pode ser nula");
         livro.definirDataDevolucao(dataDevolucao);
         livro.transitarPara(EstadosLivro.de(SituacaoLivro.DEVOLVIDO));

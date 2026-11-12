@@ -36,9 +36,4 @@ public final class EstadoEmprestado extends EstadoLivroBase {
         livro.transitarPara(EstadosLivro.de(SituacaoLivro.DEVOLVIDO));
     }
 
-    static void validarEmprestimo(Livro livro, Emprestimo emprestimo) {
-        if (emprestimo == null || !Objects.equals(emprestimo.idLivro(), livro.id())) {
-            throw new OperacaoRecusadaException("Emprestimo nao pertence ao livro");
-        }
-    }
 }

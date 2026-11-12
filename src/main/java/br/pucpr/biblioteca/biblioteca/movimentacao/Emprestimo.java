@@ -25,6 +25,22 @@ public final class Emprestimo extends Transacao {
         this.dataVencimento = dataEmprestimo.plusDays(PRAZO_DIAS);
     }
 
+    public static Emprestimo reconstituir(
+            String idTransacao,
+            String idLivro,
+            String idEstudante,
+            LocalDate dataEmprestimo,
+            LocalDate dataVencimento,
+            int numRenovacoes) {
+        if (numRenovacoes < 0) {
+            throw new IllegalArgumentException("numRenovacoes nao pode ser negativo");
+        }
+        Emprestimo emprestimo = new Emprestimo(idTransacao, idLivro, idEstudante, dataEmprestimo);
+        emprestimo.dataVencimento = Objects.requireNonNull(dataVencimento, "dataVencimento nao pode ser nula");
+        emprestimo.numRenovacoes = numRenovacoes;
+        return emprestimo;
+    }
+
     public void renovar() {
         numRenovacoes++;
         dataVencimento = dataVencimento.plusDays(DIAS_POR_RENOVACAO);

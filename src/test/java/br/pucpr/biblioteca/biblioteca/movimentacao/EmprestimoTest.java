@@ -1,6 +1,7 @@
 package br.pucpr.biblioteca.biblioteca.movimentacao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
@@ -39,5 +40,30 @@ class EmprestimoTest {
         assertEquals(0, emprestimo.diasDeAtraso(LocalDate.of(2026, 2, 9)));
         assertEquals(5, emprestimo.diasDeAtraso(LocalDate.of(2026, 2, 14)));
         assertEquals(50, emprestimo.diasDeAtraso(LocalDate.of(2026, 3, 31)));
+    }
+
+    @Test
+    void R01_reconstituiEmprestimoComPrazoERenovacoesPersistidos() {
+        Emprestimo emprestimo = Emprestimo.reconstituir(
+                "t1",
+                "l1",
+                "e1",
+                LocalDate.of(2026, 1, 10),
+                LocalDate.of(2026, 4, 20),
+                2);
+
+        assertEquals(LocalDate.of(2026, 4, 20), emprestimo.dataVencimento());
+        assertEquals(2, emprestimo.numRenovacoes());
+    }
+
+    @Test
+    void R01_reconstituirRecusaNumeroDeRenovacoesNegativo() {
+        assertThrows(IllegalArgumentException.class, () -> Emprestimo.reconstituir(
+                "t1",
+                "l1",
+                "e1",
+                LocalDate.of(2026, 1, 10),
+                LocalDate.of(2026, 2, 9),
+                -1));
     }
 }

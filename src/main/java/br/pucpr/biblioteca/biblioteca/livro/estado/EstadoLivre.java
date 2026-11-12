@@ -3,6 +3,7 @@ package br.pucpr.biblioteca.biblioteca.livro.estado;
 import br.pucpr.biblioteca.biblioteca.livro.Livro;
 import br.pucpr.biblioteca.biblioteca.livro.SituacaoLivro;
 import br.pucpr.biblioteca.biblioteca.movimentacao.Emprestimo;
+import br.pucpr.biblioteca.comum.excecoes.OperacaoRecusadaException;
 
 /**
  * Estado em que o livro está disponível.
@@ -25,7 +26,7 @@ public final class EstadoLivre extends EstadoLivroBase {
     @Override
     public void enviarParaReparo(Livro livro, boolean danoIdentificado) {
         if (!danoIdentificado) {
-            throw new IllegalArgumentException("Dano identificado deve ser verdadeiro");
+            throw new OperacaoRecusadaException("Evento enviarParaReparo requer dano identificado");
         }
         livro.transitarPara(EstadosLivro.de(SituacaoLivro.REPARANDO));
     }

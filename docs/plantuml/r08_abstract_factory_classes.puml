@@ -1,0 +1,61 @@
+@startuml
+skinparam Monochrome true
+
+interface FabricaPersistencia {
+  +criarUnidadeDeTrabalho()
+  +criarRepositorioLivro(uow)
+  +criarRepositorioMovimentacao(uow)
+  +criarRepositorioRelacionamento(uow)
+}
+
+interface UnidadeDeTrabalho {
+  +commit()
+  +rollback()
+  +close()
+}
+
+interface RepositorioLivro
+interface RepositorioMovimentacao
+interface RepositorioRelacionamento
+
+class FabricaPersistenciaMemoria
+class UnidadeDeTrabalhoMemoria
+class RepositorioLivroMemoria
+class RepositorioMovimentacaoMemoria
+class RepositorioRelacionamentoMemoria
+class ArmazenamentoMemoria
+
+class FabricaPersistenciaRelacional
+class UnidadeDeTrabalhoRelacional
+class RepositorioLivroRelacional
+class RepositorioMovimentacaoRelacional
+class RepositorioRelacionamentoRelacional
+
+FabricaPersistencia <|.. FabricaPersistenciaMemoria
+FabricaPersistencia <|.. FabricaPersistenciaRelacional
+UnidadeDeTrabalho <|.. UnidadeDeTrabalhoMemoria
+UnidadeDeTrabalho <|.. UnidadeDeTrabalhoRelacional
+RepositorioLivro <|.. RepositorioLivroMemoria
+RepositorioMovimentacao <|.. RepositorioMovimentacaoMemoria
+RepositorioRelacionamento <|.. RepositorioRelacionamentoMemoria
+RepositorioLivro <|.. RepositorioLivroRelacional
+RepositorioMovimentacao <|.. RepositorioMovimentacaoRelacional
+RepositorioRelacionamento <|.. RepositorioRelacionamentoRelacional
+
+FabricaPersistenciaMemoria ..> UnidadeDeTrabalhoMemoria
+FabricaPersistenciaMemoria ..> RepositorioLivroMemoria
+FabricaPersistenciaMemoria ..> RepositorioMovimentacaoMemoria
+FabricaPersistenciaMemoria ..> RepositorioRelacionamentoMemoria
+FabricaPersistenciaRelacional ..> UnidadeDeTrabalhoRelacional
+FabricaPersistenciaRelacional ..> RepositorioLivroRelacional
+FabricaPersistenciaRelacional ..> RepositorioMovimentacaoRelacional
+FabricaPersistenciaRelacional ..> RepositorioRelacionamentoRelacional
+
+UnidadeDeTrabalhoMemoria --> ArmazenamentoMemoria
+RepositorioLivroMemoria --> UnidadeDeTrabalhoMemoria
+RepositorioMovimentacaoMemoria --> UnidadeDeTrabalhoMemoria
+RepositorioRelacionamentoMemoria --> UnidadeDeTrabalhoMemoria
+RepositorioLivroRelacional --> UnidadeDeTrabalhoRelacional
+RepositorioMovimentacaoRelacional --> UnidadeDeTrabalhoRelacional
+RepositorioRelacionamentoRelacional --> UnidadeDeTrabalhoRelacional
+@enduml

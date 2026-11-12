@@ -220,6 +220,14 @@ class R01_CicloDeVidaLivroTest {
         assertEquals(SituacaoLivro.LIVRE, reparando.situacao());
     }
 
+    @Test
+    void R01_livreComDanoNaoIdentificadoRecusaReparo() {
+        Livro livro = new Livro("l1", "Livro");
+
+        assertThrows(OperacaoRecusadaException.class, () -> livro.enviarParaReparo(false));
+        assertEquals(SituacaoLivro.LIVRE, livro.situacao());
+    }
+
     private Emprestimo emprestimo() {
         return new Emprestimo("t1", "l1", "e1", relogio.hoje());
     }
