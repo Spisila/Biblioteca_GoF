@@ -23,4 +23,10 @@ public final class TratadorDeEstudante<T extends RegistroCadastravel> {
             return "Nao foi possivel cadastrar o estudante: " + excecao.getMessage();
         }
     }
+
+    public String consultar(String id) {
+        return cadastro.consultarPorId(id)
+                .map(registro -> "Estudante encontrado: " + registro.id())
+                .orElse("Estudante nao encontrado: " + id);
+    }
 }

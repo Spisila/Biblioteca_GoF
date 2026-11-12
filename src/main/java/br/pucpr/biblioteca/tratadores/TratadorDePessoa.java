@@ -23,4 +23,10 @@ public final class TratadorDePessoa<T extends RegistroCadastravel> {
             return "Nao foi possivel cadastrar a pessoa: " + excecao.getMessage();
         }
     }
+
+    public String consultar(String id) {
+        return cadastro.consultarPorId(id)
+                .map(registro -> "Pessoa encontrada: " + registro.id())
+                .orElse("Pessoa nao encontrada: " + id);
+    }
 }

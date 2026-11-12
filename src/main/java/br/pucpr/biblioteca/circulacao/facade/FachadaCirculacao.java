@@ -5,6 +5,8 @@ import br.pucpr.biblioteca.biblioteca.movimentacao.Emprestimo;
 import br.pucpr.biblioteca.biblioteca.relacionamento.Reserva;
 import br.pucpr.biblioteca.comum.excecoes.NaoEncontradoException;
 import br.pucpr.biblioteca.comum.relogio.Relogio;
+import br.pucpr.biblioteca.devolucao.evento.EventoDevolucao;
+import br.pucpr.biblioteca.devolucao.publicador.PublicadorDevolucao;
 import br.pucpr.biblioteca.persistencia.fabrica.FabricaPersistencia;
 import br.pucpr.biblioteca.persistencia.fabrica.RepositorioLivro;
 import br.pucpr.biblioteca.persistencia.fabrica.RepositorioMovimentacao;
@@ -22,13 +24,22 @@ import java.util.function.Function;
 public final class FachadaCirculacao {
     private final FabricaPersistencia fabricaPersistencia;
     private final Relogio relogio;
+    private final PublicadorDevolucao publicadorDevolucao;
 
     public FachadaCirculacao(
             FabricaPersistencia fabricaPersistencia,
             Relogio relogio) {
+        this(fabricaPersistencia, relogio, null);
+    }
+
+    public FachadaCirculacao(
+            FabricaPersistencia fabricaPersistencia,
+            Relogio relogio,
+            PublicadorDevolucao publicadorDevolucao) {
         this.fabricaPersistencia = Objects.requireNonNull(
                 fabricaPersistencia, "fabricaPersistencia nao pode ser nula");
         this.relogio = Objects.requireNonNull(relogio, "relogio nao pode ser nulo");
+        this.publicadorDevolucao = publicadorDevolucao;
     }
 
     public FachadaCirculacao(FabricaPersistencia fabricaPersistencia) {
@@ -112,13 +123,21 @@ public final class FachadaCirculacao {
             String idLivro,
             String idTransacao,
             LocalDate dataDevolucao) {
-        return emTransacao(repositorios -> {
+        DevolucaoConfirmada confirmada = emTransacao(repositorios -> {
             Livro livro = buscarLivro(repositorios.livros(), idLivro);
             Emprestimo emprestimo = buscarEmprestimo(repositorios.movimentacoes(), idTransacao);
             livro.registrarDevolucao(emprestimo, dataDevolucao);
             repositorios.livros().salvar(livro);
-            return livro;
+            return new DevolucaoConfirmada(livro, emprestimo, dataDevolucao);
         });
+        if (publicadorDevolucao != null) {
+            publicadorDevolucao.publicar(new EventoDevolucao(
+                    confirmada.livro(),
+                    confirmada.emprestimo().idEstudante(),
+                    confirmada.emprestimo().dataVencimento(),
+                    confirmada.dataDevolucao()));
+        }
+        return confirmada.livro();
     }
 
     public Livro registrarDevolucao(String idLivro, String idTransacao) {
@@ -163,5 +182,11 @@ public final class FachadaCirculacao {
             RepositorioLivro livros,
             RepositorioMovimentacao movimentacoes,
             RepositorioRelacionamento relacionamentos) {
+    }
+
+    private record DevolucaoConfirmada(
+            Livro livro,
+            Emprestimo emprestimo,
+            LocalDate dataDevolucao) {
     }
 }

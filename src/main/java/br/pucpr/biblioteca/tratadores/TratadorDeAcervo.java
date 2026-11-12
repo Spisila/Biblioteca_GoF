@@ -29,8 +29,28 @@ public final class TratadorDeAcervo {
         }
     }
 
+    public String cadastrar(String id, String titulo) {
+        return cadastrar(new Livro(id, titulo));
+    }
+
     public List<MetadadosLivro> listar() {
         return consulta.listar();
+    }
+
+    public String listarComoTexto() {
+        StringBuilder resultado = new StringBuilder();
+        for (MetadadosLivro metadados : listar()) {
+            if (resultado.length() > 0) {
+                resultado.append(System.lineSeparator());
+            }
+            resultado.append(metadados.id())
+                    .append(" - ")
+                    .append(metadados.titulo())
+                    .append(" (")
+                    .append(metadados.situacao())
+                    .append(')');
+        }
+        return resultado.length() == 0 ? "Nenhum livro cadastrado." : resultado.toString();
     }
 
     public String consultar(String idLivro) {

@@ -19,6 +19,10 @@ public final class CadastroAtendente<T extends RegistroCadastravel> extends Temp
         this.preRequisito = Objects.requireNonNull(preRequisito);
     }
 
+    public Optional<T> consultarPorId(String id) {
+        return repositorio.buscarPorId(id);
+    }
+
     @Override
     protected Optional<T> buscarExistente(T dados) {
         return repositorio.buscarPorId(dados.id());

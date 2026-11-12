@@ -16,6 +16,10 @@ public final class CadastroPessoa<T extends RegistroCadastravel> extends Templat
         this.repositorio = Objects.requireNonNull(repositorio);
     }
 
+    public Optional<T> consultarPorId(String id) {
+        return repositorio.buscarPorId(id);
+    }
+
     @Override
     protected Optional<T> buscarExistente(T dados) {
         return repositorio.buscarPorId(dados.id());

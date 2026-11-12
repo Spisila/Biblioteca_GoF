@@ -23,4 +23,10 @@ public final class TratadorDeAtendente<T extends RegistroCadastravel> {
             return "Nao foi possivel cadastrar o atendente: " + excecao.getMessage();
         }
     }
+
+    public String consultar(String id) {
+        return cadastro.consultarPorId(id)
+                .map(registro -> "Atendente encontrado: " + registro.id())
+                .orElse("Atendente nao encontrado: " + id);
+    }
 }
