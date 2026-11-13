@@ -4,14 +4,22 @@ import br.pucpr.biblioteca.persistencia.fabrica.UnidadeDeTrabalho;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Properties;
 import java.util.Objects;
 
 /**
  * Unidade de trabalho reservada para persistência relacional.
  *
- * <p>Padrão: R08 Abstract Factory — papel: Produto concreto.</p>
+ * <p>
+ * Padrão: R08 Abstract Factory — papel: Produto concreto.
+ * </p>
  */
 public final class UnidadeDeTrabalhoRelacional implements UnidadeDeTrabalho {
+    private static final Properties CONFIGURACAO = carregarConfiguracao();
     private final String url;
     private final String usuario;
     private final String senha;
@@ -21,7 +29,7 @@ public final class UnidadeDeTrabalhoRelacional implements UnidadeDeTrabalho {
     public UnidadeDeTrabalhoRelacional() {
         this(
                 propriedade("biblioteca.db.url", "BIBLIOTECA_DB_URL",
-                        "jdbc:mysql://localhost:3306/biblioteca?useSSL=false&serverTimezone=UTC"),
+                        "jdbc:mariadb://localhost:3306/biblioteca"),
                 propriedade("biblioteca.db.usuario", "BIBLIOTECA_DB_USUARIO", "root"),
                 propriedade("biblioteca.db.senha", "BIBLIOTECA_DB_SENHA", ""));
     }
@@ -107,7 +115,27 @@ public final class UnidadeDeTrabalhoRelacional implements UnidadeDeTrabalho {
             return valor;
         }
         valor = System.getenv(ambiente);
+        if (valor != null && !valor.isBlank()) {
+            return valor;
+        }
+        valor = CONFIGURACAO.getProperty(sistema);
         return valor == null || valor.isBlank() ? padrao : valor;
+    }
+
+    private static Properties carregarConfiguracao() {
+        Properties propriedades = new Properties();
+        Path caminho = Path.of(
+                System.getProperty("biblioteca.config", "config/biblioteca.properties"));
+        if (!Files.exists(caminho)) {
+            return propriedades;
+        }
+        try (InputStream entrada = Files.newInputStream(caminho)) {
+            propriedades.load(entrada);
+            return propriedades;
+        } catch (IOException excecao) {
+            throw new IllegalStateException(
+                    "Nao foi possivel carregar a configuracao: " + caminho, excecao);
+        }
     }
 
     private static String validarTexto(String valor, String nome) {
@@ -118,6 +146,13 @@ public final class UnidadeDeTrabalhoRelacional implements UnidadeDeTrabalho {
     }
 
     static IllegalStateException falha(String mensagem, SQLException causa) {
-        return new IllegalStateException(mensagem, causa);
+        String detalhe = causa.getMessage() == null
+                ? "sem detalhes fornecidos pelo driver JDBC"
+                : causa.getMessage();
+        return new IllegalStateException(
+                mensagem + ": " + detalhe
+                        + " [SQLState=" + causa.getSQLState()
+                        + ", codigo=" + causa.getErrorCode() + "]",
+                causa);
     }
 }

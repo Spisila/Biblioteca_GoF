@@ -31,9 +31,9 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        PerfilExecucao perfil = usarProducao(args)
-                ? PerfilExecucao.PRODUCAO
-                : PerfilExecucao.TESTE;
+        PerfilExecucao perfil = usarTeste(args)
+                ? PerfilExecucao.TESTE
+                : PerfilExecucao.PRODUCAO;
         FabricaPersistencia fabrica = Configuracao.fabricaPara(perfil);
         RelogioSistema relogio = new RelogioSistema();
 
@@ -85,9 +85,9 @@ public class Main {
         return publicador;
     }
 
-    private static boolean usarProducao(String[] args) {
+    private static boolean usarTeste(String[] args) {
         for (String argumento : args) {
-            if ("--producao".equalsIgnoreCase(argumento)) {
+            if ("--teste".equalsIgnoreCase(argumento)) {
                 return true;
             }
         }

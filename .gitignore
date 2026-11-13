@@ -5,4 +5,5 @@ build/
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
+config/biblioteca.properties
 

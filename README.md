@@ -27,8 +27,7 @@ O projeto possui:
 
 - Java Development Kit (JDK) 17.
 - Gradle Wrapper incluído no repositório.
-- MySQL compatível com o driver `com.mysql:mysql-connector-j:9.5.0`
-  para o perfil de produção.
+- MariaDB para o perfil de produção, usando o driver JDBC oficial.
 - O perfil de teste utiliza persistência em memória e não exige um servidor
   MySQL.
 
@@ -57,10 +56,16 @@ memória:
 .\gradlew.bat run
 ```
 
-Ou:
+O perfil de produção, com MariaDB, é o padrão:
 
 ```bash
 ./gradlew run
+```
+
+No Windows:
+
+```powershell
+.\gradlew.bat run
 ```
 
 O menu permite cadastrar e consultar pessoas, estudantes, atendentes e livros,
@@ -68,17 +73,27 @@ solicitar reservas, efetivar empréstimos, renovar empréstimos, registrar
 devoluções e emitir multas. A opção `D` executa um fluxo demonstrativo
 completo, incluindo renovação idempotente e devolução atrasada.
 
-Para iniciar com o perfil relacional:
+Para usar persistência em memória:
 
 ```powershell
-.\gradlew.bat run --args="--producao"
+.\gradlew.bat run --args="--teste"
 ```
 
-Configure a conexão JDBC por propriedades de sistema ou variáveis de ambiente:
+Configure a conexão JDBC em `config/biblioteca.properties`, copiando
+`config/biblioteca.properties.example`. Esse arquivo local é ignorado pelo
+Git e não deve ser versionado:
+
+```properties
+biblioteca.db.url=jdbc:mariadb://localhost:3306/biblioteca
+biblioteca.db.usuario=root
+biblioteca.db.senha=SUA_SENHA
+```
+
+Também é possível configurar por propriedades de sistema ou variáveis de ambiente:
 
 | Propriedade | Variável de ambiente | Padrão |
 |---|---|---|
-| `biblioteca.db.url` | `BIBLIOTECA_DB_URL` | `jdbc:mysql://localhost:3306/biblioteca?useSSL=false&serverTimezone=UTC` |
+| `biblioteca.db.url` | `BIBLIOTECA_DB_URL` | `jdbc:mariadb://localhost:3306/biblioteca` |
 | `biblioteca.db.usuario` | `BIBLIOTECA_DB_USUARIO` | `root` |
 | `biblioteca.db.senha` | `BIBLIOTECA_DB_SENHA` | vazio |
 
