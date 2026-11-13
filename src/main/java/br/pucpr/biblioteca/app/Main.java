@@ -14,6 +14,9 @@ import br.pucpr.biblioteca.devolucao.ouvintes.OuvinteInspecaoExemplar;
 import br.pucpr.biblioteca.devolucao.ouvintes.OuvinteMulta;
 import br.pucpr.biblioteca.devolucao.publicador.PublicadorDevolucao;
 import br.pucpr.biblioteca.financeiro.multa.EmissorMulta;
+import br.pucpr.biblioteca.financeiro.cobranca.adaptador.AdaptadorBancoA;
+import br.pucpr.biblioteca.financeiro.cobranca.bancossimulados.BancoASimulado;
+import br.pucpr.biblioteca.financeiro.cobranca.contrato.ServicoCobranca;
 import br.pucpr.biblioteca.persistencia.fabrica.FabricaPersistencia;
 import br.pucpr.biblioteca.tratadores.TratadorDeAcervo;
 import br.pucpr.biblioteca.tratadores.TratadorDeAtendente;
@@ -50,7 +53,9 @@ public class Main {
                 new CadastroAtendente<>(atendentes, registro -> true));
 
         EmissorMulta emissorMulta = new EmissorMulta();
-        PublicadorDevolucao publicador = criarPublicador(emissorMulta);
+        ServicoCobranca servicoCobranca = new ServicoCobranca(
+                new AdaptadorBancoA(new BancoASimulado()));
+        PublicadorDevolucao publicador = criarPublicador(emissorMulta, servicoCobranca);
         FachadaCirculacao fachada = new FachadaCirculacao(fabrica, relogio, publicador);
         TratadorDeEmprestimo tratadorEmprestimo = new TratadorDeEmprestimo(
                 fachada, new ExecutorComando());
@@ -68,10 +73,12 @@ public class Main {
         }
     }
 
-    private static PublicadorDevolucao criarPublicador(EmissorMulta emissorMulta) {
+    private static PublicadorDevolucao criarPublicador(
+            EmissorMulta emissorMulta,
+            ServicoCobranca servicoCobranca) {
         PublicadorDevolucao publicador = new PublicadorDevolucao();
         publicador.adicionar(new OuvinteInspecaoExemplar());
-        publicador.adicionar(new OuvinteMulta(emissorMulta));
+        publicador.adicionar(new OuvinteMulta(emissorMulta, servicoCobranca));
         publicador.adicionar(new OuvinteIndicadores());
         publicador.adicionar(new OuvinteEmail(evento ->
                 System.out.println("E-mail de devolucao enviado para " + evento.idEstudante())));

@@ -15,6 +15,9 @@ import br.pucpr.biblioteca.devolucao.ouvintes.OuvinteInspecaoExemplar;
 import br.pucpr.biblioteca.devolucao.ouvintes.OuvinteMulta;
 import br.pucpr.biblioteca.devolucao.publicador.PublicadorDevolucao;
 import br.pucpr.biblioteca.financeiro.multa.EmissorMulta;
+import br.pucpr.biblioteca.financeiro.cobranca.adaptador.AdaptadorBancoA;
+import br.pucpr.biblioteca.financeiro.cobranca.bancossimulados.BancoASimulado;
+import br.pucpr.biblioteca.financeiro.cobranca.contrato.ServicoCobranca;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
@@ -82,6 +85,29 @@ class R05_ObserverDevolucaoTest {
         assertEquals(SituacaoLivro.DEVOLVIDO, livro.situacao());
         assertEquals(1, indicadores.totalDevolucoes());
         assertFalse(publicador.falhasDosOuvintes().isEmpty());
+    }
+
+    @Test
+    void R05_multaAtrasadaEmiteCobrancaPeloAdapter() {
+        Livro livro = livroEmprestado();
+        Emprestimo emprestimo = emprestimo();
+        BancoASimulado banco = new BancoASimulado();
+        OuvinteMulta multa = new OuvinteMulta(
+                new EmissorMulta(),
+                new ServicoCobranca(new AdaptadorBancoA(banco)));
+        PublicadorDevolucao publicador = new PublicadorDevolucao();
+        publicador.adicionar(multa);
+
+        publicador.confirmarDevolucao(
+                livro,
+                emprestimo,
+                emprestimo.dataVencimento().plusDays(5));
+
+        assertEquals(1, multa.multas().size());
+        assertEquals(1, multa.cobrancas().size());
+        assertEquals(500, banco.ultimosCentavos());
+        assertEquals("e1", banco.ultimoDocumento());
+        assertEquals("A-multa-l1-2026-02-14", banco.ultimoIdentificador());
     }
 
     private Livro livroEmprestado() {

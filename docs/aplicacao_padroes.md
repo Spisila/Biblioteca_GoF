@@ -94,12 +94,18 @@ seguem o mesmo limite transacional. Falhas provocam rollback.
 - `OuvinteDevolucao` é o contrato de observação.
 - `EventoDevolucao` transporta livro, estudante, vencimento, data real e atraso.
 - `OuvinteInspecaoExemplar` registra exemplares pendentes.
-- `OuvinteMulta` emite multas para devoluções atrasadas.
+- `OuvinteMulta` emite multas para devoluções atrasadas e encaminha o valor
+  ao `ServicoCobranca`, que usa o Adapter bancário configurado.
 - `OuvinteIndicadores` atualiza estatísticas.
 - `OuvinteEmail` encaminha notificações.
 
 A publicação ocorre depois da confirmação da devolução. Uma falha em um
 ouvinte é registrada sem impedir os demais.
+
+Para uma devolução atrasada, o fluxo é `PublicadorDevolucao` →
+`OuvinteMulta` → `EmissorMulta` (Strategy) e `ServicoCobranca` (Adapter).
+Assim, o valor calculado pela política vigente é o mesmo valor enviado ao
+ banco, sem que o observador conheça a API externa.
 
 ## R06 — Command
 
