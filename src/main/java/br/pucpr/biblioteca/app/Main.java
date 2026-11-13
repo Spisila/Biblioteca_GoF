@@ -1,6 +1,7 @@
 package br.pucpr.biblioteca.app;
 
 import br.pucpr.biblioteca.biblioteca.acervo.consulta.ServicoConsultaOriginal;
+import br.pucpr.biblioteca.academico.estudante.Estudante;
 import br.pucpr.biblioteca.cadastro.CadastroAtendente;
 import br.pucpr.biblioteca.cadastro.CadastroEstudante;
 import br.pucpr.biblioteca.cadastro.CadastroLivro;
@@ -17,6 +18,8 @@ import br.pucpr.biblioteca.financeiro.multa.EmissorMulta;
 import br.pucpr.biblioteca.financeiro.cobranca.adaptador.AdaptadorBancoA;
 import br.pucpr.biblioteca.financeiro.cobranca.bancossimulados.BancoASimulado;
 import br.pucpr.biblioteca.financeiro.cobranca.contrato.ServicoCobranca;
+import br.pucpr.biblioteca.rh.atendente.Atendente;
+import br.pucpr.biblioteca.rh.pessoa.Pessoa;
 import br.pucpr.biblioteca.persistencia.fabrica.FabricaPersistencia;
 import br.pucpr.biblioteca.tratadores.TratadorDeAcervo;
 import br.pucpr.biblioteca.tratadores.TratadorDeAtendente;
@@ -27,6 +30,8 @@ import br.pucpr.biblioteca.tratadores.TratadorDeMulta;
 import br.pucpr.biblioteca.tratadores.TratadorDePessoa;
 import br.pucpr.biblioteca.ui.ConsoleBiblioteca;
 import br.pucpr.biblioteca.ui.RegistroConsole;
+import br.pucpr.biblioteca.ui.swing.BibliotecaSwingFrame;
+import javax.swing.SwingUtilities;
 import java.util.Scanner;
 
 public class Main {
@@ -36,6 +41,10 @@ public class Main {
                 : PerfilExecucao.PRODUCAO;
         FabricaPersistencia fabrica = Configuracao.fabricaPara(perfil);
         RelogioSistema relogio = new RelogioSistema();
+        if (usarSwing(args)) {
+            iniciarSwing(fabrica, relogio);
+            return;
+        }
 
         RepositorioLivroPorOperacao repositorioLivro = new RepositorioLivroPorOperacao(fabrica);
         TratadorDeAcervo tratadorAcervo = new TratadorDeAcervo(
@@ -73,6 +82,39 @@ public class Main {
         }
     }
 
+    private static void iniciarSwing(FabricaPersistencia fabrica, RelogioSistema relogio) {
+        RepositorioLivroPorOperacao repositorioLivro = new RepositorioLivroPorOperacao(fabrica);
+        TratadorDeAcervo tratadorAcervo = new TratadorDeAcervo(
+                new CadastroLivro(repositorioLivro),
+                new ServicoConsultaOriginal(repositorioLivro));
+
+        RepositorioCadastroMemoria<Pessoa> pessoas = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroMemoria<Estudante> estudantes = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroMemoria<Atendente> atendentes = new RepositorioCadastroMemoria<>();
+        TratadorDePessoa<Pessoa> tratadorPessoa = new TratadorDePessoa<>(
+                new CadastroPessoa<>(pessoas));
+        TratadorDeEstudante<Estudante> tratadorEstudante = new TratadorDeEstudante<>(
+                new CadastroEstudante<>(estudantes, registro -> true));
+        TratadorDeAtendente<Atendente> tratadorAtendente = new TratadorDeAtendente<>(
+                new CadastroAtendente<>(atendentes, registro -> true));
+
+        EmissorMulta emissorMulta = new EmissorMulta();
+        ServicoCobranca servicoCobranca = new ServicoCobranca(
+                new AdaptadorBancoA(new BancoASimulado()));
+        FachadaCirculacao fachada = new FachadaCirculacao(
+                fabrica, relogio, criarPublicador(emissorMulta, servicoCobranca));
+        TratadorDeEmprestimo tratadorEmprestimo = new TratadorDeEmprestimo(
+                fachada, new ExecutorComando());
+
+        SwingUtilities.invokeLater(() -> new BibliotecaSwingFrame(
+                tratadorAcervo,
+                tratadorPessoa,
+                tratadorEstudante,
+                tratadorAtendente,
+                tratadorEmprestimo,
+                new TratadorDeDevolucao(fachada)).setVisible(true));
+    }
+
     private static PublicadorDevolucao criarPublicador(
             EmissorMulta emissorMulta,
             ServicoCobranca servicoCobranca) {
@@ -88,6 +130,15 @@ public class Main {
     private static boolean usarTeste(String[] args) {
         for (String argumento : args) {
             if ("--teste".equalsIgnoreCase(argumento)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean usarSwing(String[] args) {
+        for (String argumento : args) {
+            if ("--swing".equalsIgnoreCase(argumento)) {
                 return true;
             }
         }
