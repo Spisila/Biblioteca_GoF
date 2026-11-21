@@ -51,9 +51,18 @@ public class Main {
                 new CadastroLivro(repositorioLivro),
                 new ServicoConsultaOriginal(repositorioLivro));
 
-        RepositorioCadastroMemoria<RegistroConsole> pessoas = new RepositorioCadastroMemoria<>();
-        RepositorioCadastroMemoria<RegistroConsole> estudantes = new RepositorioCadastroMemoria<>();
-        RepositorioCadastroMemoria<RegistroConsole> atendentes = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroMemoria<RegistroConsole> pessoasMemoria = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroMemoria<RegistroConsole> estudantesMemoria = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroMemoria<RegistroConsole> atendentesMemoria = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroPorOperacao<RegistroConsole> pessoas =
+                new RepositorioCadastroPorOperacao<>(
+                        fabrica, pessoasMemoria, RegistroConsole.class);
+        RepositorioCadastroPorOperacao<RegistroConsole> estudantes =
+                new RepositorioCadastroPorOperacao<>(
+                        fabrica, estudantesMemoria, RegistroConsole.class);
+        RepositorioCadastroPorOperacao<RegistroConsole> atendentes =
+                new RepositorioCadastroPorOperacao<>(
+                        fabrica, atendentesMemoria, RegistroConsole.class);
         TratadorDePessoa<RegistroConsole> tratadorPessoa = new TratadorDePessoa<>(
                 new CadastroPessoa<>(pessoas));
         TratadorDeEstudante<RegistroConsole> tratadorEstudante = new TratadorDeEstudante<>(
@@ -88,11 +97,19 @@ public class Main {
                 new CadastroLivro(repositorioLivro),
                 new ServicoConsultaOriginal(repositorioLivro));
 
-        RepositorioCadastroMemoria<Pessoa> pessoas = new RepositorioCadastroMemoria<>();
-        RepositorioCadastroMemoria<Estudante> estudantes = new RepositorioCadastroMemoria<>();
-        RepositorioCadastroMemoria<Atendente> atendentes = new RepositorioCadastroMemoria<>();
-        TratadorDePessoa<Pessoa> tratadorPessoa = new TratadorDePessoa<>(
-                new CadastroPessoa<>(pessoas));
+        RepositorioCadastroMemoria<Pessoa> pessoasMemoria = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroMemoria<Estudante> estudantesMemoria = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroMemoria<Atendente> atendentesMemoria = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroPorOperacao<Pessoa> pessoas =
+                new RepositorioCadastroPorOperacao<>(
+                        fabrica, pessoasMemoria, Pessoa.class);
+        RepositorioCadastroPorOperacao<Estudante> estudantes =
+                new RepositorioCadastroPorOperacao<>(
+                        fabrica, estudantesMemoria, Estudante.class);
+        RepositorioCadastroPorOperacao<Atendente> atendentes =
+                new RepositorioCadastroPorOperacao<>(
+                        fabrica, atendentesMemoria, Atendente.class);
+        TratadorDePessoa<Pessoa> tratadorPessoa = new TratadorDePessoa<>(new CadastroPessoa<>(pessoas));
         TratadorDeEstudante<Estudante> tratadorEstudante = new TratadorDeEstudante<>(
                 new CadastroEstudante<>(estudantes, registro -> true));
         TratadorDeAtendente<Atendente> tratadorAtendente = new TratadorDeAtendente<>(

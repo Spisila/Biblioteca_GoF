@@ -83,6 +83,7 @@ public final class UnidadeDeTrabalhoRelacional implements UnidadeDeTrabalho {
             try {
                 conexao = DriverManager.getConnection(url, usuario, senha);
                 conexao.setAutoCommit(false);
+                InicializadorBancoRelacional.inicializar(conexao);
             } catch (SQLException excecao) {
                 throw falha("Nao foi possivel abrir a conexao relacional", excecao);
             }
