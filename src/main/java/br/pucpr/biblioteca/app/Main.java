@@ -29,21 +29,13 @@ import br.pucpr.biblioteca.tratadores.TratadorDeEstudante;
 import br.pucpr.biblioteca.tratadores.TratadorDeMulta;
 import br.pucpr.biblioteca.tratadores.TratadorDePessoa;
 import br.pucpr.biblioteca.ui.ConsoleBiblioteca;
-import br.pucpr.biblioteca.ui.swing.BibliotecaSwingFrame;
-import javax.swing.SwingUtilities;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        PerfilExecucao perfil = usarTeste(args)
-                ? PerfilExecucao.TESTE
-                : PerfilExecucao.PRODUCAO;
+        PerfilExecucao perfil = usarTeste(args) ? PerfilExecucao.TESTE : PerfilExecucao.PRODUCAO;
         FabricaPersistencia fabrica = Configuracao.fabricaPara(perfil);
         RelogioSistema relogio = new RelogioSistema();
-        if (usarSwing(args)) {
-            iniciarSwing(fabrica, relogio);
-            return;
-        }
 
         RepositorioLivroPorOperacao repositorioLivro = new RepositorioLivroPorOperacao(fabrica);
         TratadorDeAcervo tratadorAcervo = new TratadorDeAcervo(
@@ -89,46 +81,6 @@ public class Main {
         }
     }
 
-    private static void iniciarSwing(FabricaPersistencia fabrica, RelogioSistema relogio) {
-        RepositorioLivroPorOperacao repositorioLivro = new RepositorioLivroPorOperacao(fabrica);
-        TratadorDeAcervo tratadorAcervo = new TratadorDeAcervo(
-                new CadastroLivro(repositorioLivro),
-                Configuracao.consulta(new ServicoConsultaOriginal(repositorioLivro)));
-
-        RepositorioCadastroMemoria<Pessoa> pessoasMemoria = new RepositorioCadastroMemoria<>();
-        RepositorioCadastroMemoria<Estudante> estudantesMemoria = new RepositorioCadastroMemoria<>();
-        RepositorioCadastroMemoria<Atendente> atendentesMemoria = new RepositorioCadastroMemoria<>();
-        RepositorioCadastroPorOperacao<Pessoa> pessoas =
-                new RepositorioCadastroPorOperacao<>(
-                        fabrica, pessoasMemoria, Pessoa.class);
-        RepositorioCadastroPorOperacao<Estudante> estudantes =
-                new RepositorioCadastroPorOperacao<>(
-                        fabrica, estudantesMemoria, Estudante.class);
-        RepositorioCadastroPorOperacao<Atendente> atendentes =
-                new RepositorioCadastroPorOperacao<>(
-                        fabrica, atendentesMemoria, Atendente.class);
-        TratadorDePessoa<Pessoa> tratadorPessoa = new TratadorDePessoa<>(new CadastroPessoa<>(pessoas));
-        TratadorDeEstudante<Estudante> tratadorEstudante = new TratadorDeEstudante<>(
-                new CadastroEstudante<>(estudantes, pessoas));
-        TratadorDeAtendente<Atendente> tratadorAtendente = new TratadorDeAtendente<>(
-                new CadastroAtendente<>(atendentes, pessoas));
-
-        EmissorMulta emissorMulta = new EmissorMulta(Configuracao.politicaMulta());
-        ServicoCobranca servicoCobranca = new ServicoCobranca(Configuracao.cobranca());
-        FachadaCirculacao fachada = new FachadaCirculacao(
-                fabrica, relogio, criarPublicador(emissorMulta, servicoCobranca));
-        TratadorDeEmprestimo tratadorEmprestimo = new TratadorDeEmprestimo(
-                fachada, new ExecutorComando());
-
-        SwingUtilities.invokeLater(() -> new BibliotecaSwingFrame(
-                tratadorAcervo,
-                tratadorPessoa,
-                tratadorEstudante,
-                tratadorAtendente,
-                tratadorEmprestimo,
-                new TratadorDeDevolucao(fachada)).setVisible(true));
-    }
-
     private static PublicadorDevolucao criarPublicador(
             EmissorMulta emissorMulta,
             ServicoCobranca servicoCobranca) {
@@ -144,15 +96,6 @@ public class Main {
     private static boolean usarTeste(String[] args) {
         for (String argumento : args) {
             if ("--teste".equalsIgnoreCase(argumento)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean usarSwing(String[] args) {
-        for (String argumento : args) {
-            if ("--swing".equalsIgnoreCase(argumento)) {
                 return true;
             }
         }

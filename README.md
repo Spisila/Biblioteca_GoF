@@ -22,7 +22,6 @@ O projeto possui:
 - Consultas extensíveis por cache e medição.
 - Comandos idempotentes para solicitações de circulação.
 - CLI interativa com fluxo demonstrativo completo.
-- Interface gráfica Swing com abas para livros, pessoas e circulação.
 - Cadastro de pessoas/estudantes/atendentes com `AUTO_INCREMENT` e herança física.
 
 ## Requisitos técnicos
@@ -76,15 +75,6 @@ guiado em dez etapas, apresentando cada cadastro e operação com uma pausa curt
 entre as ações. A demonstração inclui duas renovações e uma devolução atrasada,
 mostrando também a notificação dos ouvintes e a emissão da multa. A opção `14`
 lista o catálogo com os estados atuais dos livros.
-
-Para iniciar a interface gráfica Swing:
-
-```powershell
-.\gradlew.bat run --args="--swing --teste"
-```
-
-A janela possui abas para cadastro/listagem de livros, cadastro e consulta de
-pessoas/estudantes/atendentes, reservas, empréstimos, renovações e devoluções.
 
 Para usar persistência em memória:
 
@@ -154,8 +144,7 @@ decisões e correções está registrado em
 ```text
 src/main/java/br/pucpr/biblioteca/
 ├── app/                    # composição da aplicação e seleção do perfil
-├── ui/                     # CLI e interface Swing
-│   └── swing/              # telas gráficas desacopladas pelos tratadores
+├── ui/                     # interface de linha de comando
 ├── tratadores/             # tradução das entradas da UI
 ├── biblioteca/
 │   ├── livro/              # contexto e estados do livro
