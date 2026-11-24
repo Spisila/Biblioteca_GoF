@@ -51,14 +51,13 @@ Esse comando compila o projeto e executa os testes automatizados.
 
 ## Como executar a aplicação/CLI
 
-Por padrão, a aplicação inicia usando o perfil `TESTE`, com persistência em
-memória:
+Para iniciar usando o perfil `TESTE`, com persistência em memória:
 
 ```powershell
 .\gradlew.bat run
 ```
 
-O perfil de produção, com MariaDB, é o padrão:
+O perfil de produção, com MariaDB, é o padrão quando `--teste` não é informado:
 
 ```bash
 ./gradlew run
@@ -107,6 +106,15 @@ Também é possível configurar por propriedades de sistema ou variáveis de amb
 | `biblioteca.db.url` | `BIBLIOTECA_DB_URL` | `jdbc:mariadb://localhost:3306/biblioteca` |
 | `biblioteca.db.usuario` | `BIBLIOTECA_DB_USUARIO` | `root` |
 | `biblioteca.db.senha` | `BIBLIOTECA_DB_SENHA` | vazio |
+
+Também é possível configurar por propriedades de sistema ou variáveis de ambiente:
+
+| Configuração | Propriedade | Variável | Valores |
+|---|---|---|---|
+| Política de multa | `biblioteca.multa.politica` | `BIBLIOTECA_MULTA_POLITICA` | `original`, `teto`, `tolerancia` |
+| Banco de cobrança | `biblioteca.cobranca.banco` | `BIBLIOTECA_COBRANCA_BANCO` | `A`, `B` |
+| Cache de consulta | `biblioteca.consulta.cache` | `BIBLIOTECA_CONSULTA_CACHE` | `true`, `false` |
+| Medição de consulta | `biblioteca.consulta.medicao` | `BIBLIOTECA_CONSULTA_MEDICAO` | `true`, `false` |
 
 O esquema básico está disponível em [sql/schema.sql](sql/schema.sql).
 

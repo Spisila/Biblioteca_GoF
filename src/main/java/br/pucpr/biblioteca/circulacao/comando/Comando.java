@@ -15,4 +15,8 @@ public interface Comando<T> {
     Instant instanteCriacao();
 
     T executar();
+
+    default String assinaturaOperacao() {
+        return getClass().getName();
+    }
 }

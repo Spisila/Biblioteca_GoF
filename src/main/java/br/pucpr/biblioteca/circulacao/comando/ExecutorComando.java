@@ -11,16 +11,20 @@ import java.util.concurrent.ConcurrentMap;
  * <p>Padrão: R06 Command — papel: Invocador.</p>
  */
 public final class ExecutorComando {
-    private final ConcurrentMap<String, FutureTask<Object>> tarefas = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, EntradaComando> tarefas = new ConcurrentHashMap<>();
 
     public <T> T executar(Comando<T> comando) {
         FutureTask<Object> tarefaNova = new FutureTask<>(comando::executar);
-        FutureTask<Object> tarefa = tarefas.putIfAbsent(comando.idComando(), tarefaNova);
-        if (tarefa == null) {
-            tarefa = tarefaNova;
-            tarefa.run();
+        EntradaComando nova = new EntradaComando(comando.assinaturaOperacao(), tarefaNova);
+        EntradaComando entrada = tarefas.putIfAbsent(comando.idComando(), nova);
+        if (entrada == null) {
+            entrada = nova;
+            entrada.tarefa().run();
+        } else if (!entrada.assinatura().equals(comando.assinaturaOperacao())) {
+            throw new IllegalArgumentException(
+                    "O identificador do comando ja pertence a outra operacao");
         }
-        return aguardarResultado(tarefa);
+        return aguardarResultado(entrada.tarefa());
     }
 
     private static <T> T aguardarResultado(FutureTask<Object> tarefa) {
@@ -41,5 +45,8 @@ public final class ExecutorComando {
             }
             throw new IllegalStateException("Falha na execucao do comando", causa);
         }
+    }
+
+    private record EntradaComando(String assinatura, FutureTask<Object> tarefa) {
     }
 }

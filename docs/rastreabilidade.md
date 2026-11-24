@@ -13,3 +13,16 @@
 | R09 | Decorator | `ServicoConsulta` (Componente); `ServicoConsultaOriginal` (Componente concreto); `DecoratorConsulta` (Decorator abstrato); `DecoratorCache`, `DecoratorMedicao` (Decorators concretos); `MetadadosLivro` (metadados) | `R09_DecoratorConsultaTest` |
 | R10 | Composite | `ElementoAcervo` (Componente); `ItemAcervo` (Folha); `GrupoAcervo`, `SecaoAcervo`, `UnidadeAcervo` (Composites) | `R10_CompositeAcervoTest` |
 
+## Cenários realmente verificados nesta revisão
+
+- R01: estados concretos, transições, limite de duas renovações, devolução, inspeção e reconstituição em `R01_CicloDeVidaLivroTest` e `EmprestimoTest`.
+- R02: valores original, teto e tolerância e preservação da política emitida em `R02_PoliticasMultaTest`.
+- R03: conversões dos bancos A/B e idempotência em `R03_AdaptadorBancoTest`.
+- R04: empréstimo completo e rollback em `R04_FachadaCirculacaoTest`.
+- R05: publicação, ouvintes e falha isolada em `R05_ObserverDevolucaoTest`.
+- R06: renovação e reserva concorrentes com identificadores idempotentes em `R06_ComandoIdempotenteTest`.
+- R07: ordem do template, duplicidade, CPF inexistente e compartilhamento do ID da Pessoa em `R07_TemplateCadastroTest`.
+- R08: famílias memória/relacional, mixagem recusada e transações em memória em `R08_FabricaPersistenciaTest`.
+- R09: combinação cache/medição e consulta crítica do estado real em `R09_DecoratorConsultaTest`.
+- R10: cinco itens em duas seções, subseções, ciclos, duplicidade e movimentação em `R10_CompositeAcervoTest`.
+

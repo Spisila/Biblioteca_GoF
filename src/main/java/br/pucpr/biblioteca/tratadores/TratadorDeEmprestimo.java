@@ -4,6 +4,7 @@ import br.pucpr.biblioteca.biblioteca.movimentacao.Emprestimo;
 import br.pucpr.biblioteca.circulacao.facade.FachadaCirculacao;
 import br.pucpr.biblioteca.comum.excecoes.BibliotecaException;
 import br.pucpr.biblioteca.circulacao.comando.ComandoRenovacao;
+import br.pucpr.biblioteca.circulacao.comando.ComandoReserva;
 import br.pucpr.biblioteca.circulacao.comando.ExecutorComando;
 import java.time.Instant;
 import java.util.Objects;
@@ -26,7 +27,13 @@ public final class TratadorDeEmprestimo {
 
     public String reservar(String idReserva, String idLivro, String idEstudante) {
         try {
-            fachada.solicitarReserva(idReserva, idLivro, idEstudante);
+            executorComando.executar(new ComandoReserva(
+                    idReserva,
+                    "sistema",
+                    Instant.now(),
+                    fachada,
+                    idLivro,
+                    idEstudante));
             return "Reserva solicitada: " + idReserva;
         } catch (BibliotecaException | IllegalArgumentException excecao) {
             return "Nao foi possivel solicitar a reserva: " + excecao.getMessage();

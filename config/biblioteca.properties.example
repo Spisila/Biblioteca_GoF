@@ -1,3 +1,7 @@
 biblioteca.db.url=jdbc:mariadb://localhost:3306/biblioteca
 biblioteca.db.usuario=root
 biblioteca.db.senha=coloque-a-senha-do-mariadb-aqui
+biblioteca.multa.politica=original
+biblioteca.cobranca.banco=A
+biblioteca.consulta.cache=false
+biblioteca.consulta.medicao=false

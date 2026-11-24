@@ -182,7 +182,8 @@ final class InicializadorBancoRelacional {
                         situacao VARCHAR(30) NOT NULL,
                         reservado_para VARCHAR(100) NULL,
                         data_devolucao DATE NULL,
-                        PRIMARY KEY (id)
+                        PRIMARY KEY (id),
+                        UNIQUE KEY uk_pessoas_cpf (cpf)
                     ) ENGINE = InnoDB
                       DEFAULT CHARSET = utf8mb4
                       COLLATE = utf8mb4_unicode_ci

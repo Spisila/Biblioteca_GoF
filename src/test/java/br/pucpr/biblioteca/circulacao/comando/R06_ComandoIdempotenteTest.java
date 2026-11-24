@@ -3,6 +3,7 @@ package br.pucpr.biblioteca.circulacao.comando;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import br.pucpr.biblioteca.biblioteca.livro.Livro;
+import br.pucpr.biblioteca.biblioteca.livro.SituacaoLivro;
 import br.pucpr.biblioteca.biblioteca.movimentacao.Emprestimo;
 import br.pucpr.biblioteca.circulacao.facade.FachadaCirculacao;
 import br.pucpr.biblioteca.comum.relogio.RelogioFixo;
@@ -13,11 +14,39 @@ import java.time.LocalDate;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import br.pucpr.biblioteca.circulacao.comando.ComandoReserva;
 import org.junit.jupiter.api.Test;
 
 // Cenário R6: validar a execução idempotente de comandos de circulação.
 class R06_ComandoIdempotenteTest {
     private static final LocalDate DATA = LocalDate.of(2026, 11, 12);
+
+    @Test
+    void R06_reservaDuplicadaConcorrenteExecutaUmaVez() throws Exception {
+        FabricaPersistencia fabrica = new FabricaPersistenciaMemoria();
+        var unidade = fabrica.criarUnidadeDeTrabalho();
+        fabrica.criarRepositorioLivro(unidade).salvar(new Livro("l1", "Livro"));
+        unidade.commit();
+        FachadaCirculacao fachada = fachada(fabrica);
+        ExecutorComando executor = new ExecutorComando();
+        ComandoReserva comando = new ComandoReserva(
+                "cmd-reserva-1",
+                "estudante-1",
+                Instant.parse("2026-11-12T17:30:00Z"),
+                fachada,
+                "l1",
+                "e1");
+
+        ExecutorService threads = Executors.newFixedThreadPool(2);
+        try {
+            Future<Livro> primeira = threads.submit(() -> executor.executar(comando));
+            Future<Livro> segunda = threads.submit(() -> executor.executar(comando));
+            assertEquals(SituacaoLivro.RESERVADO, primeira.get().situacao());
+            assertEquals(SituacaoLivro.RESERVADO, segunda.get().situacao());
+        } finally {
+            threads.shutdownNow();
+        }
+    }
 
     @Test
     void R06_renovacaoDuplicadaNaoAlteraPrazoMaisDeUmaVez() throws Exception {

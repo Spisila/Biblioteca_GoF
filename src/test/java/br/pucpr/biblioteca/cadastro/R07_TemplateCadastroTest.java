@@ -1,10 +1,15 @@
 package br.pucpr.biblioteca.cadastro;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import br.pucpr.biblioteca.comum.excecoes.PreRequisitoNaoAtendidoException;
+import br.pucpr.biblioteca.academico.estudante.Estudante;
+import br.pucpr.biblioteca.app.RepositorioCadastroMemoria;
+import br.pucpr.biblioteca.rh.pessoa.Pessoa;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +18,56 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class R07_TemplateCadastroTest {
+    @Test
+    void R07_cpfCadastradoCriaEstudanteComMesmoIdDaPessoa() {
+        RepositorioCadastroMemoria<Pessoa> pessoas = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroMemoria<Estudante> estudantes = new RepositorioCadastroMemoria<>();
+        CadastroPessoa<Pessoa> cadastroPessoa = new CadastroPessoa<>(pessoas);
+        Pessoa pessoa = cadastroPessoa.incluir(new Pessoa(
+                "Ana", "12345678901", "ana@teste", LocalDate.of(2000, 1, 1)));
+        CadastroEstudante<Estudante> cadastroEstudante =
+                new CadastroEstudante<>(estudantes, pessoas);
+
+        Estudante estudante = cadastroEstudante.incluir(new Estudante(
+                "", "Ana", "12345678901", "ana@teste",
+                "2026001", "BCC", 5, LocalDate.of(2000, 1, 1)));
+
+        assertEquals(pessoa.id(), estudante.id());
+    }
+
+    @Test
+    void R07_cpfInexistenteNaoGeraPessoaOuEstudante() {
+        RepositorioCadastroMemoria<Pessoa> pessoas = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroMemoria<Estudante> estudantes = new RepositorioCadastroMemoria<>();
+        CadastroEstudante<Estudante> cadastro =
+                new CadastroEstudante<>(estudantes, pessoas);
+
+        assertThrows(PreRequisitoNaoAtendidoException.class,
+                () -> cadastro.incluir(new Estudante(
+                        "", "Sem Pessoa", "99999999999", "sem@teste",
+                        "2026999", "BCC", 5, LocalDate.of(2000, 1, 1))));
+        assertFalse(pessoas.buscarPorCpf("99999999999").isPresent());
+        assertFalse(estudantes.buscarPorCpf("99999999999").isPresent());
+    }
+
+    @Test
+    void R07_estudanteDuplicadoPorCpfRetornaExistente() {
+        RepositorioCadastroMemoria<Pessoa> pessoas = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroMemoria<Estudante> estudantes = new RepositorioCadastroMemoria<>();
+        Pessoa pessoa = new CadastroPessoa<Pessoa>(pessoas).incluir(new Pessoa(
+                "Ana", "12345678901", "ana@teste", LocalDate.of(2000, 1, 1)));
+        CadastroEstudante<Estudante> cadastro =
+                new CadastroEstudante<>(estudantes, pessoas);
+        Estudante original = cadastro.incluir(new Estudante(
+                "", "Ana", "12345678901", "ana@teste",
+                "2026001", "BCC", 5, LocalDate.of(2000, 1, 1)));
+
+        Estudante repetido = cadastro.incluir(new Estudante(
+                pessoa.id(), "Nome alterado", "12345678901", "novo@teste",
+                "OUTRA", "OUTRO", 9, LocalDate.of(2001, 1, 1)));
+
+        assertSame(original, repetido);
+    }
     @Test
     void R07_itemDuplicadoRetornaCadastroExistente() {
         RepositorioFake repositorio = new RepositorioFake();

@@ -15,20 +15,19 @@ class R10_CompositeAcervoTest {
     @Test
     void R10_contaRecursivamenteUnidadeSecoesESubsecoes() {
         UnidadeAcervo unidade = new UnidadeAcervo("u1", "Biblioteca");
-        SecaoAcervo humanas = new SecaoAcervo("s1", "Humanas");
-        SecaoAcervo historia = new SecaoAcervo("ss1", "Historia");
-        SecaoAcervo tecnologia = new SecaoAcervo("s2", "Tecnologia");
-        humanas.adicionar(new ItemAcervo("i1", "l1"));
-        historia.adicionar(new ItemAcervo("i2", "l2"));
-        historia.adicionar(new ItemAcervo("i3", "l3"));
-        tecnologia.adicionar(new ItemAcervo("i4", "l4"));
-        humanas.adicionar(historia);
-        unidade.adicionar(humanas);
-        unidade.adicionar(tecnologia);
+        SecaoAcervo primeira = new SecaoAcervo("s1", "Primeira");
+        SecaoAcervo segunda = new SecaoAcervo("s2", "Segunda");
+        primeira.adicionar(new ItemAcervo("i1", "l1"));
+        primeira.adicionar(new ItemAcervo("i2", "l2"));
+        primeira.adicionar(new ItemAcervo("i3", "l3"));
+        segunda.adicionar(new ItemAcervo("i4", "l4"));
+        segunda.adicionar(new ItemAcervo("i5", "l5"));
+        unidade.adicionar(primeira);
+        unidade.adicionar(segunda);
 
-        assertEquals(4, unidade.contarElementos());
-        assertEquals(4, unidade.listarIdsLivros().size());
-        assertEquals(4, unidade.listarIdsLivros().stream().distinct().count());
+        assertEquals(5, unidade.contarElementos());
+        assertEquals(List.of("l1", "l2", "l3", "l4", "l5"),
+                unidade.listarIdsLivros());
     }
 
     @Test

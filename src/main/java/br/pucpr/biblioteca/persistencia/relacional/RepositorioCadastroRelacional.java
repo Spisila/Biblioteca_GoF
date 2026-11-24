@@ -3,6 +3,7 @@ package br.pucpr.biblioteca.persistencia.relacional;
 import br.pucpr.biblioteca.academico.estudante.Estudante;
 import br.pucpr.biblioteca.cadastro.RegistroCadastravel;
 import br.pucpr.biblioteca.cadastro.RepositorioCadastro;
+import br.pucpr.biblioteca.comum.excecoes.PreRequisitoNaoAtendidoException;
 import br.pucpr.biblioteca.rh.atendente.Atendente;
 import br.pucpr.biblioteca.rh.pessoa.Pessoa;
 import br.pucpr.biblioteca.ui.RegistroConsole;
@@ -42,18 +43,32 @@ public final class RepositorioCadastroRelacional<T extends RegistroCadastravel>
     }
 
     @Override
+    public Optional<T> buscarPorCpf(String cpf) {
+        if (tipo == Estudante.class) {
+            return buscarEstudantePorCpf(cpf).map(tipo::cast);
+        }
+        if (tipo == Atendente.class) {
+            return buscarAtendentePorCpf(cpf).map(tipo::cast);
+        }
+        if (tipo == Pessoa.class) {
+            return buscarPessoaPorCpf(cpf).map(tipo::cast);
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public T salvar(T registro) {
-        if (registro instanceof Estudante) {
-            return (T) salvarEstudante((Estudante) registro);
+        if (registro instanceof Estudante estudante) {
+            return tipo.cast(salvarEstudante(estudante));
         }
-        if (registro instanceof Atendente) {
-            return (T) salvarAtendente((Atendente) registro);
+        if (registro instanceof Atendente atendente) {
+            return tipo.cast(salvarAtendente(atendente));
         }
-        if (registro instanceof Pessoa) {
-            return (T) salvarPessoa((Pessoa) registro);
+        if (registro instanceof Pessoa pessoa) {
+            return tipo.cast(salvarPessoa(pessoa));
         }
-        if (registro instanceof RegistroConsole) {
-            return (T) salvarRegistroConsole((RegistroConsole) registro);
+        if (registro instanceof RegistroConsole registroConsole) {
+            return tipo.cast(salvarRegistroConsole(registroConsole));
         }
         throw new IllegalArgumentException(
                 "Tipo de cadastro nao suportado: " + registro.getClass().getName());
@@ -64,17 +79,32 @@ public final class RepositorioCadastroRelacional<T extends RegistroCadastravel>
                 "SELECT id, nome, cpf, email, data_nascimento FROM pessoas WHERE id = ?")) {
             statement.setString(1, id);
             try (ResultSet resultado = statement.executeQuery()) {
-                return resultado.next()
-                        ? Optional.of(new Pessoa(
-                        resultado.getString("id"),
-                        resultado.getString("nome"),
-                        resultado.getString("cpf"),
-                        resultado.getString("email"),
-                        resultado.getDate("data_nascimento").toLocalDate()))
-                        : Optional.empty();
+                if (!resultado.next()) {
+                    return Optional.empty();
+                }
+                return Optional.of(pessoa(resultado));
             }
         } catch (SQLException excecao) {
             throw UnidadeDeTrabalhoRelacional.falha("Nao foi possivel buscar pessoa", excecao);
+        }
+    }
+
+    private Optional<Pessoa> buscarPessoaPorCpf(String cpf) {
+        try (PreparedStatement statement = unidade.conexao().prepareStatement(
+                "SELECT id, nome, cpf, email, data_nascimento FROM pessoas WHERE cpf = ?")) {
+            statement.setString(1, cpf);
+            try (ResultSet resultado = statement.executeQuery()) {
+                if (!resultado.next()) {
+                    return Optional.empty();
+                }
+                Pessoa pessoa = pessoa(resultado);
+                if (resultado.next()) {
+                    throw new IllegalStateException("CPF duplicado encontrado: " + cpf);
+                }
+                return Optional.of(pessoa);
+            }
+        } catch (SQLException excecao) {
+            throw UnidadeDeTrabalhoRelacional.falha("Nao foi possivel buscar pessoa por CPF", excecao);
         }
     }
 
@@ -82,24 +112,34 @@ public final class RepositorioCadastroRelacional<T extends RegistroCadastravel>
         try (PreparedStatement statement = unidade.conexao().prepareStatement(
                 "SELECT p.id, p.nome, p.cpf, p.email, p.data_nascimento, "
                         + "e.numero_matricula, e.curso, e.limite_emprestimos "
-                        + "FROM estudantes e JOIN pessoas p ON p.id = e.id "
-                        + "WHERE e.id = ?")) {
+                        + "FROM estudantes e JOIN pessoas p ON p.id = e.id WHERE e.id = ?")) {
             statement.setString(1, id);
             try (ResultSet resultado = statement.executeQuery()) {
-                return resultado.next()
-                        ? Optional.of(new Estudante(
-                        resultado.getString("id"),
-                        resultado.getString("nome"),
-                        resultado.getString("cpf"),
-                        resultado.getString("email"),
-                        resultado.getString("numero_matricula"),
-                        resultado.getString("curso"),
-                        resultado.getInt("limite_emprestimos"),
-                        resultado.getDate("data_nascimento").toLocalDate()))
-                        : Optional.empty();
+                return resultado.next() ? Optional.of(estudante(resultado)) : Optional.empty();
             }
         } catch (SQLException excecao) {
             throw UnidadeDeTrabalhoRelacional.falha("Nao foi possivel buscar estudante", excecao);
+        }
+    }
+
+    private Optional<Estudante> buscarEstudantePorCpf(String cpf) {
+        try (PreparedStatement statement = unidade.conexao().prepareStatement(
+                "SELECT p.id, p.nome, p.cpf, p.email, p.data_nascimento, "
+                        + "e.numero_matricula, e.curso, e.limite_emprestimos "
+                        + "FROM estudantes e JOIN pessoas p ON p.id = e.id WHERE p.cpf = ?")) {
+            statement.setString(1, cpf);
+            try (ResultSet resultado = statement.executeQuery()) {
+                if (!resultado.next()) {
+                    return Optional.empty();
+                }
+                Estudante estudante = estudante(resultado);
+                if (resultado.next()) {
+                    throw new IllegalStateException("Mais de um estudante usa o CPF: " + cpf);
+                }
+                return Optional.of(estudante);
+            }
+        } catch (SQLException excecao) {
+            throw UnidadeDeTrabalhoRelacional.falha("Nao foi possivel buscar estudante por CPF", excecao);
         }
     }
 
@@ -107,23 +147,34 @@ public final class RepositorioCadastroRelacional<T extends RegistroCadastravel>
         try (PreparedStatement statement = unidade.conexao().prepareStatement(
                 "SELECT p.id, p.nome, p.cpf, p.email, p.data_nascimento, "
                         + "a.turno, a.registro_funcional "
-                        + "FROM atendentes a JOIN pessoas p ON p.id = a.id "
-                        + "WHERE a.id = ?")) {
+                        + "FROM atendentes a JOIN pessoas p ON p.id = a.id WHERE a.id = ?")) {
             statement.setString(1, id);
             try (ResultSet resultado = statement.executeQuery()) {
-                return resultado.next()
-                        ? Optional.of(new Atendente(
-                        resultado.getString("id"),
-                        resultado.getString("nome"),
-                        resultado.getString("cpf"),
-                        resultado.getString("email"),
-                        resultado.getString("turno"),
-                        resultado.getString("registro_funcional"),
-                        resultado.getDate("data_nascimento").toLocalDate()))
-                        : Optional.empty();
+                return resultado.next() ? Optional.of(atendente(resultado)) : Optional.empty();
             }
         } catch (SQLException excecao) {
             throw UnidadeDeTrabalhoRelacional.falha("Nao foi possivel buscar atendente", excecao);
+        }
+    }
+
+    private Optional<Atendente> buscarAtendentePorCpf(String cpf) {
+        try (PreparedStatement statement = unidade.conexao().prepareStatement(
+                "SELECT p.id, p.nome, p.cpf, p.email, p.data_nascimento, "
+                        + "a.turno, a.registro_funcional "
+                        + "FROM atendentes a JOIN pessoas p ON p.id = a.id WHERE p.cpf = ?")) {
+            statement.setString(1, cpf);
+            try (ResultSet resultado = statement.executeQuery()) {
+                if (!resultado.next()) {
+                    return Optional.empty();
+                }
+                Atendente atendente = atendente(resultado);
+                if (resultado.next()) {
+                    throw new IllegalStateException("Mais de um atendente usa o CPF: " + cpf);
+                }
+                return Optional.of(atendente);
+            }
+        } catch (SQLException excecao) {
+            throw UnidadeDeTrabalhoRelacional.falha("Nao foi possivel buscar atendente por CPF", excecao);
         }
     }
 
@@ -134,8 +185,7 @@ public final class RepositorioCadastroRelacional<T extends RegistroCadastravel>
             try (ResultSet resultado = statement.executeQuery()) {
                 return resultado.next()
                         ? Optional.of(new RegistroConsole(
-                        resultado.getString("id"),
-                        resultado.getString("nome")))
+                                resultado.getString("id"), resultado.getString("nome")))
                         : Optional.empty();
             }
         } catch (SQLException excecao) {
@@ -145,10 +195,9 @@ public final class RepositorioCadastroRelacional<T extends RegistroCadastravel>
 
     private Pessoa salvarPessoa(Pessoa pessoa) {
         if (pessoa.id().isBlank()) {
-            String inserir = "INSERT INTO pessoas (nome, cpf, email, data_nascimento) "
-                    + "VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO pessoas (nome, cpf, email, data_nascimento) VALUES (?, ?, ?, ?)";
             try (PreparedStatement statement = unidade.conexao().prepareStatement(
-                    inserir, Statement.RETURN_GENERATED_KEYS)) {
+                    sql, Statement.RETURN_GENERATED_KEYS)) {
                 statement.setString(1, pessoa.nome());
                 statement.setString(2, pessoa.cpf());
                 statement.setString(3, pessoa.email());
@@ -167,8 +216,7 @@ public final class RepositorioCadastroRelacional<T extends RegistroCadastravel>
             }
         }
         try (PreparedStatement statement = unidade.conexao().prepareStatement(
-                "UPDATE pessoas SET nome = ?, cpf = ?, email = ?, data_nascimento = ? "
-                        + "WHERE id = ?")) {
+                "UPDATE pessoas SET nome = ?, cpf = ?, email = ?, data_nascimento = ? WHERE id = ?")) {
             statement.setString(1, pessoa.nome());
             statement.setString(2, pessoa.cpf());
             statement.setString(3, pessoa.email());
@@ -182,12 +230,15 @@ public final class RepositorioCadastroRelacional<T extends RegistroCadastravel>
     }
 
     private Estudante salvarEstudante(Estudante estudante) {
-        Pessoa pessoa = salvarPessoa(new Pessoa(
-                estudante.id(), estudante.nome(), estudante.cpf(),
-                estudante.email(), estudante.dataNascimento()));
+        Pessoa pessoa = buscarPessoaPorCpf(estudante.cpf())
+                .orElseThrow(() -> new PreRequisitoNaoAtendidoException(
+                        "Pessoa com CPF " + estudante.cpf() + " nao esta cadastrada"));
+        return inserirEstudante(pessoa, estudante);
+    }
+
+    private Estudante inserirEstudante(Pessoa pessoa, Estudante estudante) {
         try (PreparedStatement statement = unidade.conexao().prepareStatement(
-                "INSERT INTO estudantes "
-                        + "(id, numero_matricula, curso, limite_emprestimos) "
+                "INSERT INTO estudantes (id, numero_matricula, curso, limite_emprestimos) "
                         + "VALUES (?, ?, ?, ?) "
                         + "ON DUPLICATE KEY UPDATE numero_matricula = VALUES(numero_matricula), "
                         + "curso = VALUES(curso), limite_emprestimos = VALUES(limite_emprestimos)")) {
@@ -206,12 +257,11 @@ public final class RepositorioCadastroRelacional<T extends RegistroCadastravel>
     }
 
     private Atendente salvarAtendente(Atendente atendente) {
-        Pessoa pessoa = salvarPessoa(new Pessoa(
-                atendente.id(), atendente.nome(), atendente.cpf(),
-                atendente.email(), atendente.dataNascimento()));
+        Pessoa pessoa = buscarPessoaPorCpf(atendente.cpf())
+                .orElseThrow(() -> new PreRequisitoNaoAtendidoException(
+                        "Pessoa com CPF " + atendente.cpf() + " nao esta cadastrada"));
         try (PreparedStatement statement = unidade.conexao().prepareStatement(
-                "INSERT INTO atendentes "
-                        + "(id, turno, registro_funcional) "
+                "INSERT INTO atendentes (id, turno, registro_funcional) "
                         + "VALUES (?, ?, ?) "
                         + "ON DUPLICATE KEY UPDATE turno = VALUES(turno), "
                         + "registro_funcional = VALUES(registro_funcional)")) {
@@ -221,8 +271,7 @@ public final class RepositorioCadastroRelacional<T extends RegistroCadastravel>
             statement.executeUpdate();
             return new Atendente(
                     pessoa.id(), pessoa.nome(), pessoa.cpf(), pessoa.email(),
-                    atendente.turno(), atendente.registroFuncional(),
-                    pessoa.dataNascimento());
+                    atendente.turno(), atendente.registroFuncional(), pessoa.dataNascimento());
         } catch (SQLException excecao) {
             throw UnidadeDeTrabalhoRelacional.falha("Nao foi possivel salvar atendente", excecao);
         }
@@ -244,5 +293,37 @@ public final class RepositorioCadastroRelacional<T extends RegistroCadastravel>
         } catch (SQLException excecao) {
             throw UnidadeDeTrabalhoRelacional.falha("Nao foi possivel salvar registro", excecao);
         }
+    }
+
+    private static Pessoa pessoa(ResultSet resultado) throws SQLException {
+        return new Pessoa(
+                resultado.getString("id"),
+                resultado.getString("nome"),
+                resultado.getString("cpf"),
+                resultado.getString("email"),
+                resultado.getDate("data_nascimento").toLocalDate());
+    }
+
+    private static Estudante estudante(ResultSet resultado) throws SQLException {
+        return new Estudante(
+                resultado.getString("id"),
+                resultado.getString("nome"),
+                resultado.getString("cpf"),
+                resultado.getString("email"),
+                resultado.getString("numero_matricula"),
+                resultado.getString("curso"),
+                resultado.getInt("limite_emprestimos"),
+                resultado.getDate("data_nascimento").toLocalDate());
+    }
+
+    private static Atendente atendente(ResultSet resultado) throws SQLException {
+        return new Atendente(
+                resultado.getString("id"),
+                resultado.getString("nome"),
+                resultado.getString("cpf"),
+                resultado.getString("email"),
+                resultado.getString("turno"),
+                resultado.getString("registro_funcional"),
+                resultado.getDate("data_nascimento").toLocalDate());
     }
 }

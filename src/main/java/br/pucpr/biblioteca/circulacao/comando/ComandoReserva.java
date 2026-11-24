@@ -54,6 +54,11 @@ public final class ComandoReserva implements Comando<Livro> {
         return fachada.solicitarReserva(idComando, idLivro, idEstudante);
     }
 
+    @Override
+    public String assinaturaOperacao() {
+        return getClass().getName() + "|" + idLivro + "|" + idEstudante;
+    }
+
     private static String validarTexto(String valor, String nome) {
         if (valor == null || valor.isBlank()) {
             throw new IllegalArgumentException(nome + " nao pode ser vazio");

@@ -40,6 +40,21 @@ final class RepositorioCadastroPorOperacao<T extends RegistroCadastravel>
     }
 
     @Override
+    public Optional<T> buscarPorCpf(String cpf) {
+        UnidadeDeTrabalho unidade = fabrica.criarUnidadeDeTrabalho();
+        try {
+            Optional<T> resultado = repositorio(unidade).buscarPorCpf(cpf);
+            unidade.rollback();
+            return resultado;
+        } catch (RuntimeException excecao) {
+            unidade.rollback();
+            throw excecao;
+        } finally {
+            unidade.close();
+        }
+    }
+
+    @Override
     public T salvar(T registro) {
         UnidadeDeTrabalho unidade = fabrica.criarUnidadeDeTrabalho();
         try {

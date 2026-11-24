@@ -17,6 +17,7 @@ import java.util.Set;
  * <p>Padrão: R03 Adapter — papel: Adaptador abstrato.</p>
  */
 abstract class AdaptadorCobrancaBase implements Cobranca {
+    
     private final Map<String, CobrancaEmitida> cobrancas = new HashMap<>();
     private final Set<String> notificacoesProcessadas = new HashSet<>();
 

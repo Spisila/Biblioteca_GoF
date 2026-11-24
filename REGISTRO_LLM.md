@@ -26,4 +26,5 @@ do repositório e os testes automatizados.
 | 2026-11-12 | Reescrever o `README.md` com visão geral, requisitos, comandos, CLI, LLM, estrutura e mapeamento dos padrões. | Implementado. |
 | 2026-11-12 18:52 | Atualizar este registro com todos os pedidos realizados e criar documentação detalhada da aplicação dos padrões GoF. | Implementado. |
 | 2026-11-24 | Refatorar cadastros, remover IDs manuais do CLI/Swing, adicionar data de nascimento, separar estudantes/atendentes nas subtabelas, usar IDs gerados pelo banco e centralizar a escolha de acesso a dados em repositórios JDBC. | Implementado; suíte passou. |
+| 2026-11-24 | Revisar R04, R06 e R07; integrar reserva ao executor; impedir inserção automática de Pessoa no cadastro relacional de estudante/atendente; centralizar políticas, bancos e decoradores; corrigir o cenário de cinco livros do Composite. Modelo específico não identificado no histórico. | Correções implementadas e validadas por `clean test` e `build`. Pendências nativas Astah/PDF e integração real MariaDB mantidas explicitamente. |
 

@@ -39,7 +39,8 @@ CREATE TABLE IF NOT EXISTS pessoas (
     cpf VARCHAR(20) NOT NULL,
     email VARCHAR(255) NOT NULL,
     data_nascimento DATE NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_pessoas_cpf (cpf)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS estudantes (

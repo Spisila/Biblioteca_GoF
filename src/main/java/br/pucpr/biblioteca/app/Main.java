@@ -48,7 +48,7 @@ public class Main {
         RepositorioLivroPorOperacao repositorioLivro = new RepositorioLivroPorOperacao(fabrica);
         TratadorDeAcervo tratadorAcervo = new TratadorDeAcervo(
                 new CadastroLivro(repositorioLivro),
-                new ServicoConsultaOriginal(repositorioLivro));
+                Configuracao.consulta(new ServicoConsultaOriginal(repositorioLivro)));
 
         RepositorioCadastroMemoria<Pessoa> pessoasMemoria = new RepositorioCadastroMemoria<>();
         RepositorioCadastroMemoria<Estudante> estudantesMemoria = new RepositorioCadastroMemoria<>();
@@ -65,13 +65,12 @@ public class Main {
         TratadorDePessoa<Pessoa> tratadorPessoa = new TratadorDePessoa<>(
                 new CadastroPessoa<>(pessoas));
         TratadorDeEstudante<Estudante> tratadorEstudante = new TratadorDeEstudante<>(
-                new CadastroEstudante<>(estudantes, registro -> true));
+                new CadastroEstudante<>(estudantes, pessoas));
         TratadorDeAtendente<Atendente> tratadorAtendente = new TratadorDeAtendente<>(
-                new CadastroAtendente<>(atendentes, registro -> true));
+                new CadastroAtendente<>(atendentes, pessoas));
 
-        EmissorMulta emissorMulta = new EmissorMulta();
-        ServicoCobranca servicoCobranca = new ServicoCobranca(
-                new AdaptadorBancoA(new BancoASimulado()));
+        EmissorMulta emissorMulta = new EmissorMulta(Configuracao.politicaMulta());
+        ServicoCobranca servicoCobranca = new ServicoCobranca(Configuracao.cobranca());
         PublicadorDevolucao publicador = criarPublicador(emissorMulta, servicoCobranca);
         FachadaCirculacao fachada = new FachadaCirculacao(fabrica, relogio, publicador);
         TratadorDeEmprestimo tratadorEmprestimo = new TratadorDeEmprestimo(
@@ -94,7 +93,7 @@ public class Main {
         RepositorioLivroPorOperacao repositorioLivro = new RepositorioLivroPorOperacao(fabrica);
         TratadorDeAcervo tratadorAcervo = new TratadorDeAcervo(
                 new CadastroLivro(repositorioLivro),
-                new ServicoConsultaOriginal(repositorioLivro));
+                Configuracao.consulta(new ServicoConsultaOriginal(repositorioLivro)));
 
         RepositorioCadastroMemoria<Pessoa> pessoasMemoria = new RepositorioCadastroMemoria<>();
         RepositorioCadastroMemoria<Estudante> estudantesMemoria = new RepositorioCadastroMemoria<>();
@@ -110,13 +109,12 @@ public class Main {
                         fabrica, atendentesMemoria, Atendente.class);
         TratadorDePessoa<Pessoa> tratadorPessoa = new TratadorDePessoa<>(new CadastroPessoa<>(pessoas));
         TratadorDeEstudante<Estudante> tratadorEstudante = new TratadorDeEstudante<>(
-                new CadastroEstudante<>(estudantes, registro -> true));
+                new CadastroEstudante<>(estudantes, pessoas));
         TratadorDeAtendente<Atendente> tratadorAtendente = new TratadorDeAtendente<>(
-                new CadastroAtendente<>(atendentes, registro -> true));
+                new CadastroAtendente<>(atendentes, pessoas));
 
-        EmissorMulta emissorMulta = new EmissorMulta();
-        ServicoCobranca servicoCobranca = new ServicoCobranca(
-                new AdaptadorBancoA(new BancoASimulado()));
+        EmissorMulta emissorMulta = new EmissorMulta(Configuracao.politicaMulta());
+        ServicoCobranca servicoCobranca = new ServicoCobranca(Configuracao.cobranca());
         FachadaCirculacao fachada = new FachadaCirculacao(
                 fabrica, relogio, criarPublicador(emissorMulta, servicoCobranca));
         TratadorDeEmprestimo tratadorEmprestimo = new TratadorDeEmprestimo(
