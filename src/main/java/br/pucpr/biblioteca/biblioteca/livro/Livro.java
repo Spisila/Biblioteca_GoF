@@ -19,9 +19,13 @@ public final class Livro {
     private LocalDate dataDevolucao;
 
     public Livro(String id, String titulo) {
-        this.id = validarTexto(id, "id");
+        this.id = id == null ? "" : id.trim();
         this.titulo = validarTexto(titulo, "titulo");
         this.estado = EstadosLivro.de(SituacaoLivro.LIVRE);
+    }
+
+    public Livro(String titulo) {
+        this("", titulo);
     }
 
     public static Livro reconstituir(

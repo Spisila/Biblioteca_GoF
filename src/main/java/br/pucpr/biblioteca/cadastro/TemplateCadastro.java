@@ -18,8 +18,8 @@ public abstract class TemplateCadastro<T> {
         validarDados(dados);
         verificarPreRequisitos(dados);
         T registro = criarRegistro(dados);
-        armazenar(registro);
-        return apresentar(registro);
+        T persistido = armazenar(registro);
+        return apresentar(persistido);
     }
 
     protected abstract Optional<T> buscarExistente(T dados);
@@ -31,7 +31,7 @@ public abstract class TemplateCadastro<T> {
 
     protected abstract T criarRegistro(T dados);
 
-    protected abstract void armazenar(T registro);
+    protected abstract T armazenar(T registro);
 
     protected T apresentar(T registro) {
         return registro;

@@ -23,6 +23,7 @@ O projeto possui:
 - Comandos idempotentes para solicitações de circulação.
 - CLI interativa com fluxo demonstrativo completo.
 - Interface gráfica Swing com abas para livros, pessoas e circulação.
+- Cadastro de pessoas/estudantes/atendentes com `AUTO_INCREMENT` e herança física.
 
 ## Requisitos técnicos
 

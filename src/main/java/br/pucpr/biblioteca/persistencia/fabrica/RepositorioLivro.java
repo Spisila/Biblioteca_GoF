@@ -10,7 +10,7 @@ import java.util.Optional;
  * <p>Padrão: R08 Abstract Factory — papel: Produto abstrato.</p>
  */
 public interface RepositorioLivro {
-    void salvar(Livro livro);
+    Livro salvar(Livro livro);
 
     Optional<Livro> buscarPorId(String id);
 

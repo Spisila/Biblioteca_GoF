@@ -30,8 +30,8 @@ public final class CadastroEstudante<T extends RegistroCadastravel> extends Temp
 
     @Override
     protected void validarDados(T dados) {
-        if (dados.id() == null || dados.id().isBlank()) {
-            throw new IllegalArgumentException("Registro deve possuir id");
+        if (dados == null) {
+            throw new IllegalArgumentException("Dados do estudante nao podem ser nulos");
         }
     }
 
@@ -48,7 +48,7 @@ public final class CadastroEstudante<T extends RegistroCadastravel> extends Temp
     }
 
     @Override
-    protected void armazenar(T registro) {
-        repositorio.salvar(registro);
+    protected T armazenar(T registro) {
+        return repositorio.salvar(registro);
     }
 }

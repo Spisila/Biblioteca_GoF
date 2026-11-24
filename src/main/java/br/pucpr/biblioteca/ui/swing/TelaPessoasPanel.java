@@ -8,6 +8,7 @@ import br.pucpr.biblioteca.tratadores.TratadorDeEstudante;
 import br.pucpr.biblioteca.tratadores.TratadorDePessoa;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.time.LocalDate;
 import java.util.Objects;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -42,18 +43,19 @@ public final class TelaPessoasPanel extends JPanel {
     }
 
     private JPanel formularioPessoa() {
-        JTextField id = campo();
         JTextField nome = campo();
         JTextField cpf = campo();
         JTextField email = campo();
+        JTextField nascimento = campo();
         JPanel painel = formulario(
-                new String[]{"ID", "Nome", "CPF", "E-mail"},
-                new JTextField[]{id, nome, cpf, email});
+                new String[]{"Nome", "CPF", "E-mail", "Nascimento (AAAA-MM-DD)"},
+                new JTextField[]{nome, cpf, email, nascimento});
         JButton cadastrar = new JButton("Cadastrar pessoa");
         cadastrar.addActionListener(evento -> {
             try {
                 informar(pessoa.cadastrar(new Pessoa(
-                        valor(id), valor(nome), valor(cpf), valor(email))));
+                        valor(nome), valor(cpf), valor(email),
+                        LocalDate.parse(valor(nascimento)))));
             } catch (IllegalArgumentException excecao) {
                 erro(excecao.getMessage());
             }
@@ -64,21 +66,23 @@ public final class TelaPessoasPanel extends JPanel {
     }
 
     private JPanel formularioEstudante() {
-        JTextField id = campo();
         JTextField nome = campo();
         JTextField cpf = campo();
         JTextField email = campo();
+        JTextField nascimento = campo();
         JTextField matricula = campo();
         JTextField curso = campo();
         JTextField limite = campo();
         JPanel painel = formulario(
-                new String[]{"ID", "Nome", "CPF", "E-mail", "Matrícula", "Curso", "Limite"},
-                new JTextField[]{id, nome, cpf, email, matricula, curso, limite});
+                new String[]{"Nome", "CPF", "E-mail", "Nascimento (AAAA-MM-DD)",
+                        "Matrícula", "Curso", "Limite"},
+                new JTextField[]{nome, cpf, email, nascimento, matricula, curso, limite});
         JButton cadastrar = new JButton("Cadastrar estudante");
         cadastrar.addActionListener(evento -> {
             try {
                 informar(estudante.cadastrar(new Estudante(
-                        valor(id), valor(nome), valor(cpf), valor(email),
+                        valor(nome), valor(cpf), valor(email),
+                        LocalDate.parse(valor(nascimento)),
                         valor(matricula), valor(curso), Integer.parseInt(valor(limite)))));
             } catch (IllegalArgumentException excecao) {
                 erro(excecao.getMessage());
@@ -90,20 +94,22 @@ public final class TelaPessoasPanel extends JPanel {
     }
 
     private JPanel formularioAtendente() {
-        JTextField id = campo();
         JTextField nome = campo();
         JTextField cpf = campo();
         JTextField email = campo();
+        JTextField nascimento = campo();
         JTextField turno = campo();
         JTextField registro = campo();
         JPanel painel = formulario(
-                new String[]{"ID", "Nome", "CPF", "E-mail", "Turno", "Registro funcional"},
-                new JTextField[]{id, nome, cpf, email, turno, registro});
+                new String[]{"Nome", "CPF", "E-mail", "Nascimento (AAAA-MM-DD)",
+                        "Turno", "Registro funcional"},
+                new JTextField[]{nome, cpf, email, nascimento, turno, registro});
         JButton cadastrar = new JButton("Cadastrar atendente");
         cadastrar.addActionListener(evento -> {
             try {
                 informar(atendente.cadastrar(new Atendente(
-                        valor(id), valor(nome), valor(cpf), valor(email),
+                        valor(nome), valor(cpf), valor(email),
+                        LocalDate.parse(valor(nascimento)),
                         valor(turno), valor(registro))));
             } catch (IllegalArgumentException excecao) {
                 erro(excecao.getMessage());

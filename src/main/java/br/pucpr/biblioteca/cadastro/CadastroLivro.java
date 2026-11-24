@@ -29,8 +29,8 @@ public final class CadastroLivro extends TemplateCadastro<Livro> {
 
     @Override
     protected void validarDados(Livro dados) {
-        if (dados.id().isBlank() || dados.titulo().isBlank()) {
-            throw new IllegalArgumentException("Livro deve possuir id e titulo");
+        if (dados.titulo().isBlank()) {
+            throw new IllegalArgumentException("Livro deve possuir titulo");
         }
     }
 
@@ -40,7 +40,7 @@ public final class CadastroLivro extends TemplateCadastro<Livro> {
     }
 
     @Override
-    protected void armazenar(Livro registro) {
-        repositorio.salvar(registro);
+    protected Livro armazenar(Livro registro) {
+        return repositorio.salvar(registro);
     }
 }

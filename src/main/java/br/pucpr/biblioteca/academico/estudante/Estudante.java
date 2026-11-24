@@ -1,6 +1,7 @@
 package br.pucpr.biblioteca.academico.estudante;
 
 import br.pucpr.biblioteca.rh.pessoa.Pessoa;
+import java.time.LocalDate;
 import java.util.Objects;
 
 /**
@@ -19,7 +20,37 @@ public final class Estudante extends Pessoa {
             String numeroMatricula,
             String curso,
             int limiteEmprestimos) {
-        super(id, nome, cpf, email);
+        this(id, nome, cpf, email, numeroMatricula, curso, limiteEmprestimos,
+                LocalDate.of(1900, 1, 1));
+    }
+
+    public Estudante(
+            String id,
+            String nome,
+            String cpf,
+            String email,
+            String numeroMatricula,
+            String curso,
+            int limiteEmprestimos,
+            LocalDate dataNascimento) {
+        super(id, nome, cpf, email, dataNascimento);
+        this.numeroMatricula = validarTexto(numeroMatricula, "numeroMatricula");
+        this.curso = validarTexto(curso, "curso");
+        if (limiteEmprestimos < 0) {
+            throw new IllegalArgumentException("limiteEmprestimos nao pode ser negativo");
+        }
+        this.limiteEmprestimos = limiteEmprestimos;
+    }
+
+    public Estudante(
+            String nome,
+            String cpf,
+            String email,
+            LocalDate dataNascimento,
+            String numeroMatricula,
+            String curso,
+            int limiteEmprestimos) {
+        super(nome, cpf, email, dataNascimento);
         this.numeroMatricula = validarTexto(numeroMatricula, "numeroMatricula");
         this.curso = validarTexto(curso, "curso");
         if (limiteEmprestimos < 0) {

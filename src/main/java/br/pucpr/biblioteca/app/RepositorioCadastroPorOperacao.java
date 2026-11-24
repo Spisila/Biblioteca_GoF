@@ -40,11 +40,12 @@ final class RepositorioCadastroPorOperacao<T extends RegistroCadastravel>
     }
 
     @Override
-    public void salvar(T registro) {
+    public T salvar(T registro) {
         UnidadeDeTrabalho unidade = fabrica.criarUnidadeDeTrabalho();
         try {
-            repositorio(unidade).salvar(registro);
+            T persistido = repositorio(unidade).salvar(registro);
             unidade.commit();
+            return persistido;
         } catch (RuntimeException excecao) {
             unidade.rollback();
             throw excecao;

@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface RepositorioCadastro<T> {
     Optional<T> buscarPorId(String id);
 
-    void salvar(T registro);
+    T salvar(T registro);
 }

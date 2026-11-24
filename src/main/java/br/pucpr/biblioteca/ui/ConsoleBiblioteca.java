@@ -7,19 +7,23 @@ import br.pucpr.biblioteca.tratadores.TratadorDeEmprestimo;
 import br.pucpr.biblioteca.tratadores.TratadorDeEstudante;
 import br.pucpr.biblioteca.tratadores.TratadorDeMulta;
 import br.pucpr.biblioteca.tratadores.TratadorDePessoa;
+import br.pucpr.biblioteca.academico.estudante.Estudante;
+import br.pucpr.biblioteca.rh.atendente.Atendente;
+import br.pucpr.biblioteca.rh.pessoa.Pessoa;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.UUID;
 
 /**
  * Interface interativa da aplicação; todas as operações passam pelos tratadores.
  */
 public final class ConsoleBiblioteca {
     private final TratadorDeAcervo acervo;
-    private final TratadorDePessoa<RegistroConsole> pessoa;
-    private final TratadorDeEstudante<RegistroConsole> estudante;
-    private final TratadorDeAtendente<RegistroConsole> atendente;
+    private final TratadorDePessoa<Pessoa> pessoa;
+    private final TratadorDeEstudante<Estudante> estudante;
+    private final TratadorDeAtendente<Atendente> atendente;
     private final TratadorDeEmprestimo emprestimo;
     private final TratadorDeDevolucao devolucao;
     private final TratadorDeMulta multa;
@@ -27,9 +31,9 @@ public final class ConsoleBiblioteca {
 
     public ConsoleBiblioteca(
             TratadorDeAcervo acervo,
-            TratadorDePessoa<RegistroConsole> pessoa,
-            TratadorDeEstudante<RegistroConsole> estudante,
-            TratadorDeAtendente<RegistroConsole> atendente,
+            TratadorDePessoa<Pessoa> pessoa,
+            TratadorDeEstudante<Estudante> estudante,
+            TratadorDeAtendente<Atendente> atendente,
             TratadorDeEmprestimo emprestimo,
             TratadorDeDevolucao devolucao,
             TratadorDeMulta multa,
@@ -75,36 +79,33 @@ public final class ConsoleBiblioteca {
                 cadastrarLivro();
                 break;
             case "5":
-                System.out.println(acervo.consultar(ler("Id do livro: ")));
-                break;
-            case "12":
                 System.out.println(pessoa.consultar(ler("Id da pessoa: ")));
                 break;
-            case "13":
+            case "6":
                 System.out.println(estudante.consultar(ler("Id do estudante: ")));
                 break;
-            case "14":
+            case "7":
                 System.out.println(atendente.consultar(ler("Id do atendente: ")));
                 break;
-            case "6":
-                System.out.println(emprestimo.reservar(
-                        ler("Id da reserva: "), ler("Id do livro: "), ler("Id do estudante: ")));
-                break;
-            case "7":
-                System.out.println(emprestimo.realizar(
-                        ler("Id do emprestimo: "), ler("Id do livro: "), ler("Id do estudante: ")));
-                break;
             case "8":
-                renovar();
+                System.out.println(acervo.consultar(ler("Id do livro: ")));
                 break;
             case "9":
-                devolver();
+                reservar();
                 break;
             case "10":
-                System.out.println(multa.emitir(Integer.parseInt(ler("Dias de atraso: "))));
+                System.out.println(emprestimo.realizar(
+                        "T-" + UUID.randomUUID(), ler("Id do livro: "),
+                        ler("Id do estudante: ")));
                 break;
             case "11":
-                System.out.println(acervo.listarComoTexto());
+                renovar();
+                break;
+            case "12":
+                devolver();
+                break;
+            case "13":
+                System.out.println(multa.emitir(Integer.parseInt(ler("Dias de atraso: "))));
                 break;
             case "D":
             case "d":
@@ -119,28 +120,62 @@ public final class ConsoleBiblioteca {
     }
 
     private void cadastrarPessoa() {
-        System.out.println(pessoa.cadastrar(new RegistroConsole(
-                ler("Id da pessoa: "), ler("Descricao: "))));
+        try {
+            System.out.println(pessoa.cadastrar(new Pessoa(
+                    ler("Nome: "),
+                    ler("CPF: "),
+                    ler("E-mail: "),
+                    LocalDate.parse(ler("Data de nascimento (AAAA-MM-DD): ")))));
+        } catch (DateTimeParseException excecao) {
+            System.out.println("Data de nascimento invalida.");
+        }
     }
 
     private void cadastrarEstudante() {
-        System.out.println(estudante.cadastrar(new RegistroConsole(
-                ler("Id do estudante: "), ler("Descricao: "))));
+        try {
+            System.out.println(estudante.cadastrar(new Estudante(
+                    ler("Nome: "),
+                    ler("CPF: "),
+                    ler("E-mail: "),
+                    LocalDate.parse(ler("Data de nascimento (AAAA-MM-DD): ")),
+                    ler("Numero de matricula: "),
+                    ler("Curso: "),
+                    Integer.parseInt(ler("Limite de emprestimos: ")))));
+        } catch (DateTimeParseException excecao) {
+            System.out.println("Data de nascimento invalida.");
+        } catch (NumberFormatException excecao) {
+            System.out.println("Limite de emprestimos invalido.");
+        }
     }
 
     private void cadastrarAtendente() {
-        System.out.println(atendente.cadastrar(new RegistroConsole(
-                ler("Id do atendente: "), ler("Descricao: "))));
+        try {
+            System.out.println(atendente.cadastrar(new Atendente(
+                    ler("Nome: "),
+                    ler("CPF: "),
+                    ler("E-mail: "),
+                    LocalDate.parse(ler("Data de nascimento (AAAA-MM-DD): ")),
+                    ler("Turno: "),
+                    ler("Registro funcional: "))));
+        } catch (DateTimeParseException excecao) {
+            System.out.println("Data de nascimento invalida.");
+        }
     }
 
     private void cadastrarLivro() {
-        System.out.println(acervo.cadastrar(ler("Id do livro: "), ler("Titulo: ")));
+        System.out.println(acervo.cadastrar(ler("Titulo: ")));
+    }
+
+    private void reservar() {
+        System.out.println(emprestimo.reservar(
+                "R-" + UUID.randomUUID(),
+                ler("Id do livro: "),
+                ler("Id do estudante: ")));
     }
 
     private void renovar() {
-        String idComando = ler("Id unico do comando: ");
         boolean sucesso = emprestimo.renovarIdempotente(
-                idComando,
+                "CMD-" + UUID.randomUUID(),
                 ler("Autor: "),
                 ler("Id do livro: "),
                 ler("Id do emprestimo: "),
@@ -164,20 +199,43 @@ public final class ConsoleBiblioteca {
     }
 
     private void demonstrarFluxo() {
-        System.out.println(pessoa.cadastrar(new RegistroConsole("p-demo", "Pessoa demonstracao")));
-        System.out.println(estudante.cadastrar(new RegistroConsole("e-demo", "Estudante demonstracao")));
-        System.out.println(atendente.cadastrar(new RegistroConsole("a-demo", "Atendente demonstracao")));
-        System.out.println(acervo.cadastrar("l-demo", "Livro demonstracao"));
-        System.out.println(emprestimo.reservar("r-demo", "l-demo", "e-demo"));
-        System.out.println(emprestimo.realizar("t-demo", "l-demo", "e-demo"));
+        String pessoaCriada = pessoa.cadastrar(new Pessoa(
+                "Pessoa demonstracao", "00000000000", "demo@example.com",
+                LocalDate.of(1990, 1, 1)));
+        String estudanteCriado = estudante.cadastrar(new Estudante(
+                "Estudante demonstracao", "11111111111", "estudante@example.com",
+                LocalDate.of(2000, 1, 1), "MAT-DEMO", "Sistemas", 5));
+        String atendenteCriado = atendente.cadastrar(new Atendente(
+                "Atendente demonstracao", "22222222222", "atendente@example.com",
+                LocalDate.of(1985, 1, 1), "Integral", "RF-DEMO"));
+        String livroCriado = acervo.cadastrar("Livro demonstracao");
+        System.out.println(pessoaCriada);
+        System.out.println(estudanteCriado);
+        System.out.println(atendenteCriado);
+        System.out.println(livroCriado);
+
+        String idEstudante = idGerado(estudanteCriado);
+        String idLivro = idGerado(livroCriado);
+        String idTransacao = "T-DEMO-" + UUID.randomUUID();
+        System.out.println(emprestimo.reservar(
+                "R-DEMO-" + UUID.randomUUID(), idLivro, idEstudante));
+        System.out.println(emprestimo.realizar(idTransacao, idLivro, idEstudante));
         System.out.println(emprestimo.renovarIdempotente(
-                "cmd-demo", "a-demo", "l-demo", "t-demo", java.time.Instant.now()));
+                "CMD-DEMO-" + UUID.randomUUID(),
+                "a-demo", idLivro, idTransacao, java.time.Instant.now()));
         System.out.println(emprestimo.renovarIdempotente(
-                "cmd-demo", "a-demo", "l-demo", "t-demo", java.time.Instant.now()));
+                "CMD-DEMO-" + UUID.randomUUID(),
+                "a-demo", idLivro, idTransacao, java.time.Instant.now()));
         System.out.println(devolucao.registrar(
-                "l-demo", "t-demo", LocalDate.now().plusDays(100))
+                idLivro, idTransacao, LocalDate.now().plusDays(100))
                 ? "Devolucao demonstrativa registrada."
                 : "Devolucao demonstrativa recusada.");
+    }
+
+    private String idGerado(String mensagem) {
+        int separador = mensagem.lastIndexOf(':');
+        return separador >= 0 ? mensagem.substring(separador + 1).trim()
+                : "";
     }
 
     private String ler(String mensagem) {
@@ -188,20 +246,22 @@ public final class ConsoleBiblioteca {
     private void imprimirMenu() {
         System.out.println();
         System.out.println("=== Biblioteca GoF ===");
+        System.out.println("--- Cadastros ---");
         System.out.println("1 - Cadastrar pessoa");
         System.out.println("2 - Cadastrar estudante");
         System.out.println("3 - Cadastrar atendente");
         System.out.println("4 - Cadastrar livro");
-        System.out.println("5 - Consultar livro");
-        System.out.println("6 - Solicitar reserva");
-        System.out.println("7 - Efetivar emprestimo");
-        System.out.println("8 - Renovar emprestimo (Command idempotente)");
-        System.out.println("9 - Registrar devolucao");
-        System.out.println("10 - Emitir multa");
-        System.out.println("11 - Listar livros");
-        System.out.println("12 - Consultar pessoa");
-        System.out.println("13 - Consultar estudante");
-        System.out.println("14 - Consultar atendente");
+        System.out.println("--- Consultas ---");
+        System.out.println("5 - Consultar pessoa");
+        System.out.println("6 - Consultar estudante");
+        System.out.println("7 - Consultar atendente");
+        System.out.println("8 - Consultar livro");
+        System.out.println("--- Circulacao ---");
+        System.out.println("9 - Solicitar reserva");
+        System.out.println("10 - Efetivar emprestimo");
+        System.out.println("11 - Renovar emprestimo (Command idempotente)");
+        System.out.println("12 - Registrar devolucao");
+        System.out.println("13 - Emitir multa");
         System.out.println("D - Executar fluxo demonstrativo");
         System.out.println("0 - Sair");
         System.out.print("Opcao: ");

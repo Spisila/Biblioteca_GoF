@@ -29,7 +29,27 @@ public final class RepositorioLivroRelacional implements RepositorioLivro {
     }
 
     @Override
-    public void salvar(Livro livro) {
+    public Livro salvar(Livro livro) {
+        if (livro.id().isBlank()) {
+            String inserir = "INSERT INTO livros "
+                    + "(titulo, situacao, reservado_para, data_devolucao) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement insert = conexao().prepareStatement(
+                    inserir, Statement.RETURN_GENERATED_KEYS)) {
+                preencher(insert, livro, 1);
+                insert.executeUpdate();
+                try (ResultSet chaves = insert.getGeneratedKeys()) {
+                    if (!chaves.next()) {
+                        throw new SQLException("Banco nao retornou o ID gerado do livro");
+                    }
+                    String id = chaves.getString(1);
+                    return Livro.reconstituir(
+                            id, livro.titulo(), livro.situacao(),
+                            livro.reservadoPara(), livro.dataDevolucao());
+                }
+            } catch (SQLException excecao) {
+                throw UnidadeDeTrabalhoRelacional.falha("Nao foi possivel salvar o livro", excecao);
+            }
+        }
         String atualizar = "UPDATE livros SET titulo = ?, situacao = ?, reservado_para = ?, "
                 + "data_devolucao = ? WHERE id = ?";
         try (PreparedStatement statement = conexao().prepareStatement(atualizar)) {
@@ -44,6 +64,7 @@ public final class RepositorioLivroRelacional implements RepositorioLivro {
                     insert.executeUpdate();
                 }
             }
+            return livro;
         } catch (SQLException excecao) {
             throw UnidadeDeTrabalhoRelacional.falha("Nao foi possivel salvar o livro", excecao);
         }

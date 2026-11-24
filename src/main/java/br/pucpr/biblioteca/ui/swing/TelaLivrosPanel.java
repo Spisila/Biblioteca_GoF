@@ -23,7 +23,6 @@ import javax.swing.table.DefaultTableModel;
  */
 public final class TelaLivrosPanel extends JPanel {
     private final TratadorDeAcervo acervo;
-    private final JTextField id = new JTextField(15);
     private final JTextField titulo = new JTextField(25);
     private final JTextField idConsulta = new JTextField(15);
     private final DefaultTableModel modelo = new DefaultTableModel(
@@ -40,10 +39,8 @@ public final class TelaLivrosPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JPanel formulario = new JPanel(new GridBagLayout());
-        adicionar(formulario, new JLabel("ID:"), 0, 0);
-        adicionar(formulario, id, 1, 0);
-        adicionar(formulario, new JLabel("Título:"), 0, 1);
-        adicionar(formulario, titulo, 1, 1);
+        adicionar(formulario, new JLabel("Título:"), 0, 0);
+        adicionar(formulario, titulo, 1, 0);
 
         JButton cadastrar = new JButton("Cadastrar");
         cadastrar.addActionListener(evento -> cadastrar());
@@ -64,11 +61,11 @@ public final class TelaLivrosPanel extends JPanel {
     }
 
     private void cadastrar() {
-        if (id.getText().isBlank() || titulo.getText().isBlank()) {
-            erro("Informe o ID e o título do livro.");
+        if (titulo.getText().isBlank()) {
+            erro("Informe o título do livro.");
             return;
         }
-        informar(acervo.cadastrar(id.getText().trim(), titulo.getText().trim()));
+        informar(acervo.cadastrar(titulo.getText().trim()));
         atualizarLista();
     }
 

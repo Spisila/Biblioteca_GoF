@@ -27,7 +27,9 @@ public final class CadastroPessoa<T extends RegistroCadastravel> extends Templat
 
     @Override
     protected void validarDados(T dados) {
-        validarId(dados);
+        if (dados == null) {
+            throw new IllegalArgumentException("Dados da pessoa nao podem ser nulos");
+        }
     }
 
     @Override
@@ -36,13 +38,7 @@ public final class CadastroPessoa<T extends RegistroCadastravel> extends Templat
     }
 
     @Override
-    protected void armazenar(T registro) {
-        repositorio.salvar(registro);
-    }
-
-    private void validarId(T dados) {
-        if (dados.id() == null || dados.id().isBlank()) {
-            throw new IllegalArgumentException("Registro deve possuir id");
-        }
+    protected T armazenar(T registro) {
+        return repositorio.salvar(registro);
     }
 }

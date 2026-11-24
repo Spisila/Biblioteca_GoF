@@ -29,7 +29,6 @@ import br.pucpr.biblioteca.tratadores.TratadorDeEstudante;
 import br.pucpr.biblioteca.tratadores.TratadorDeMulta;
 import br.pucpr.biblioteca.tratadores.TratadorDePessoa;
 import br.pucpr.biblioteca.ui.ConsoleBiblioteca;
-import br.pucpr.biblioteca.ui.RegistroConsole;
 import br.pucpr.biblioteca.ui.swing.BibliotecaSwingFrame;
 import javax.swing.SwingUtilities;
 import java.util.Scanner;
@@ -51,23 +50,23 @@ public class Main {
                 new CadastroLivro(repositorioLivro),
                 new ServicoConsultaOriginal(repositorioLivro));
 
-        RepositorioCadastroMemoria<RegistroConsole> pessoasMemoria = new RepositorioCadastroMemoria<>();
-        RepositorioCadastroMemoria<RegistroConsole> estudantesMemoria = new RepositorioCadastroMemoria<>();
-        RepositorioCadastroMemoria<RegistroConsole> atendentesMemoria = new RepositorioCadastroMemoria<>();
-        RepositorioCadastroPorOperacao<RegistroConsole> pessoas =
+        RepositorioCadastroMemoria<Pessoa> pessoasMemoria = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroMemoria<Estudante> estudantesMemoria = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroMemoria<Atendente> atendentesMemoria = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroPorOperacao<Pessoa> pessoas =
                 new RepositorioCadastroPorOperacao<>(
-                        fabrica, pessoasMemoria, RegistroConsole.class);
-        RepositorioCadastroPorOperacao<RegistroConsole> estudantes =
+                        fabrica, pessoasMemoria, Pessoa.class);
+        RepositorioCadastroPorOperacao<Estudante> estudantes =
                 new RepositorioCadastroPorOperacao<>(
-                        fabrica, estudantesMemoria, RegistroConsole.class);
-        RepositorioCadastroPorOperacao<RegistroConsole> atendentes =
+                        fabrica, estudantesMemoria, Estudante.class);
+        RepositorioCadastroPorOperacao<Atendente> atendentes =
                 new RepositorioCadastroPorOperacao<>(
-                        fabrica, atendentesMemoria, RegistroConsole.class);
-        TratadorDePessoa<RegistroConsole> tratadorPessoa = new TratadorDePessoa<>(
+                        fabrica, atendentesMemoria, Atendente.class);
+        TratadorDePessoa<Pessoa> tratadorPessoa = new TratadorDePessoa<>(
                 new CadastroPessoa<>(pessoas));
-        TratadorDeEstudante<RegistroConsole> tratadorEstudante = new TratadorDeEstudante<>(
+        TratadorDeEstudante<Estudante> tratadorEstudante = new TratadorDeEstudante<>(
                 new CadastroEstudante<>(estudantes, registro -> true));
-        TratadorDeAtendente<RegistroConsole> tratadorAtendente = new TratadorDeAtendente<>(
+        TratadorDeAtendente<Atendente> tratadorAtendente = new TratadorDeAtendente<>(
                 new CadastroAtendente<>(atendentes, registro -> true));
 
         EmissorMulta emissorMulta = new EmissorMulta();

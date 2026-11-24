@@ -63,9 +63,10 @@ class R07_TemplateCadastroTest {
         }
 
         @Override
-        public void salvar(RegistroTeste registro) {
+        public RegistroTeste salvar(RegistroTeste registro) {
             quantidadeGravacoes++;
             dados.put(registro.id(), registro);
+            return registro;
         }
     }
 
@@ -99,8 +100,9 @@ class R07_TemplateCadastroTest {
         }
 
         @Override
-        protected void armazenar(RegistroTeste registro) {
+        protected RegistroTeste armazenar(RegistroTeste registro) {
             etapas.add("armazenar");
+            return registro;
         }
 
         @Override

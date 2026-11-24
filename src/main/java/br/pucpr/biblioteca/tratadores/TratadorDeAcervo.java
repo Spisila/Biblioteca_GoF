@@ -33,6 +33,10 @@ public final class TratadorDeAcervo {
         return cadastrar(new Livro(id, titulo));
     }
 
+    public String cadastrar(String titulo) {
+        return cadastrar(new Livro(titulo));
+    }
+
     public List<MetadadosLivro> listar() {
         return consulta.listar();
     }

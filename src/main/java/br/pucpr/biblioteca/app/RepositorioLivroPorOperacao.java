@@ -20,11 +20,8 @@ final class RepositorioLivroPorOperacao implements RepositorioLivro {
     }
 
     @Override
-    public void salvar(Livro livro) {
-        executar(repositorio -> {
-            repositorio.salvar(livro);
-            return null;
-        });
+    public Livro salvar(Livro livro) {
+        return executar(repositorio -> repositorio.salvar(livro));
     }
 
     @Override

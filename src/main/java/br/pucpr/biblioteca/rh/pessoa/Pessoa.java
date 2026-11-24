@@ -1,6 +1,7 @@
 package br.pucpr.biblioteca.rh.pessoa;
 
 import br.pucpr.biblioteca.cadastro.RegistroCadastravel;
+import java.time.LocalDate;
 import java.util.Objects;
 
 /**
@@ -11,12 +12,28 @@ public class Pessoa implements RegistroCadastravel {
     private final String nome;
     private final String cpf;
     private final String email;
+    private final LocalDate dataNascimento;
 
     public Pessoa(String id, String nome, String cpf, String email) {
-        this.id = validarTexto(id, "id");
+        this(id, nome, cpf, email, LocalDate.of(1900, 1, 1));
+    }
+
+    public Pessoa(
+            String id,
+            String nome,
+            String cpf,
+            String email,
+            LocalDate dataNascimento) {
+        this.id = id == null ? "" : id.trim();
         this.nome = validarTexto(nome, "nome");
         this.cpf = validarTexto(cpf, "cpf");
         this.email = validarTexto(email, "email");
+        this.dataNascimento = Objects.requireNonNull(
+                dataNascimento, "dataNascimento nao pode ser nula");
+    }
+
+    public Pessoa(String nome, String cpf, String email, LocalDate dataNascimento) {
+        this("", nome, cpf, email, dataNascimento);
     }
 
     @Override
@@ -34,6 +51,10 @@ public class Pessoa implements RegistroCadastravel {
 
     public final String email() {
         return email;
+    }
+
+    public final LocalDate dataNascimento() {
+        return dataNascimento;
     }
 
     @Override

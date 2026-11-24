@@ -202,3 +202,23 @@ portanto não altera o `Livro` nem seu estado de empréstimo.
 Esse fluxo mantém a interface desacoplada das entidades, repositórios e regras
 internas do domínio.
 
+## Estratégia de acesso a dados
+
+O projeto adota repositórios JDBC centralizados na camada de persistência,
+sem views ou stored procedures. Essa escolha preserva o MVC em camadas e o
+R08 Abstract Factory: o domínio depende apenas de interfaces e os SQLs ficam
+encapsulados em `persistencia.relacional`.
+
+- **Vantagens:** portabilidade entre bancos compatíveis com JDBC, versionamento
+  do schema em SQL, facilidade de testes e transações com `commit/rollback`;
+- **Desvantagens:** consultas complexas ficam espalhadas em classes Java e
+  podem exigir joins manuais;
+- **VIEW:** seria adequada para consultas puramente analíticas repetidas,
+  mas não substitui operações transacionais;
+- **PROCEDURE/FUNCTION:** pode encapsular regras puramente bancárias, porém
+  aumenta acoplamento ao MySQL/MariaDB e dificulta portabilidade e testes.
+
+Os cadastros especializados seguem herança física: `pessoas` é a tabela base
+e `estudantes`/`atendentes` possuem FK exclusiva para `pessoas.id`. Os IDs
+de pessoa e livro são gerados por `AUTO_INCREMENT` no perfil relacional.
+

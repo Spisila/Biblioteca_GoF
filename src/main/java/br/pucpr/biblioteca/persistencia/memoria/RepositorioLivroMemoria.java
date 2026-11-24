@@ -5,6 +5,7 @@ import br.pucpr.biblioteca.persistencia.fabrica.RepositorioLivro;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Repositório de livros em memória.
@@ -19,8 +20,13 @@ public final class RepositorioLivroMemoria implements RepositorioLivro {
     }
 
     @Override
-    public void salvar(Livro livro) {
-        unidadeDeTrabalho.livros().put(livro.id(), ArmazenamentoMemoria.copiarLivro(livro));
+    public Livro salvar(Livro livro) {
+        String id = livro.id().isBlank() ? "L-" + UUID.randomUUID() : livro.id();
+        Livro persistido = Livro.reconstituir(
+                id, livro.titulo(), livro.situacao(),
+                livro.reservadoPara(), livro.dataDevolucao());
+        unidadeDeTrabalho.livros().put(id, ArmazenamentoMemoria.copiarLivro(persistido));
+        return persistido;
     }
 
     @Override

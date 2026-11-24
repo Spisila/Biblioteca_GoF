@@ -1,6 +1,7 @@
 package br.pucpr.biblioteca.rh.atendente;
 
 import br.pucpr.biblioteca.rh.pessoa.Pessoa;
+import java.time.LocalDate;
 import java.util.Objects;
 
 /**
@@ -17,7 +18,31 @@ public final class Atendente extends Pessoa {
             String email,
             String turno,
             String registroFuncional) {
-        super(id, nome, cpf, email);
+        this(id, nome, cpf, email, turno, registroFuncional,
+                LocalDate.of(1900, 1, 1));
+    }
+
+    public Atendente(
+            String id,
+            String nome,
+            String cpf,
+            String email,
+            String turno,
+            String registroFuncional,
+            LocalDate dataNascimento) {
+        super(id, nome, cpf, email, dataNascimento);
+        this.turno = validarTexto(turno, "turno");
+        this.registroFuncional = validarTexto(registroFuncional, "registroFuncional");
+    }
+
+    public Atendente(
+            String nome,
+            String cpf,
+            String email,
+            LocalDate dataNascimento,
+            String turno,
+            String registroFuncional) {
+        super(nome, cpf, email, dataNascimento);
         this.turno = validarTexto(turno, "turno");
         this.registroFuncional = validarTexto(registroFuncional, "registroFuncional");
     }
