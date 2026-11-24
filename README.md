@@ -72,7 +72,10 @@ No Windows:
 O menu permite cadastrar e consultar pessoas, estudantes, atendentes e livros,
 solicitar reservas, efetivar empréstimos, renovar empréstimos, registrar
 devoluções e emitir multas. A opção `D` executa um fluxo demonstrativo
-completo, incluindo renovação idempotente e devolução atrasada.
+guiado em dez etapas, apresentando cada cadastro e operação com uma pausa curta
+entre as ações. A demonstração inclui duas renovações e uma devolução atrasada,
+mostrando também a notificação dos ouvintes e a emissão da multa. A opção `14`
+lista o catálogo com os estados atuais dos livros.
 
 Para iniciar a interface gráfica Swing:
 
@@ -99,7 +102,7 @@ biblioteca.db.usuario=root
 biblioteca.db.senha=SUA_SENHA
 ```
 
-Também é possível configurar por propriedades de sistema ou variáveis de ambiente:
+As credenciais também podem ser fornecidas por propriedades de sistema ou variáveis de ambiente:
 
 | Propriedade | Variável de ambiente | Padrão |
 |---|---|---|
@@ -107,7 +110,7 @@ Também é possível configurar por propriedades de sistema ou variáveis de amb
 | `biblioteca.db.usuario` | `BIBLIOTECA_DB_USUARIO` | `root` |
 | `biblioteca.db.senha` | `BIBLIOTECA_DB_SENHA` | vazio |
 
-Também é possível configurar por propriedades de sistema ou variáveis de ambiente:
+Opções administrativas adicionais:
 
 | Configuração | Propriedade | Variável | Valores |
 |---|---|---|---|
