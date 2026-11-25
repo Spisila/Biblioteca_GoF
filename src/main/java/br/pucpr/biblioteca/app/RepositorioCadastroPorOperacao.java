@@ -69,7 +69,6 @@ final class RepositorioCadastroPorOperacao<T extends RegistroCadastravel>
         }
     }
 
-    @SuppressWarnings("unchecked")
     private RepositorioCadastro<T> repositorio(UnidadeDeTrabalho unidade) {
         if (unidade instanceof UnidadeDeTrabalhoRelacional) {
             return new RepositorioCadastroRelacional<>(

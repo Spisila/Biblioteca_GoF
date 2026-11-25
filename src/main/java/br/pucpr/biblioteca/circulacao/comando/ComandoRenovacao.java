@@ -33,7 +33,12 @@ public final class ComandoRenovacao implements Comando<Emprestimo> {
         this.idLivro = validarTexto(idLivro, "idLivro");
         this.idTransacao = validarTexto(idTransacao, "idTransacao");
     }
-
+    
+    @Override
+    public Emprestimo executar() {
+        return fachada.registrarRenovacao(idLivro, idTransacao);
+    }
+    
     @Override
     public String idComando() {
         return idComando;
@@ -47,11 +52,6 @@ public final class ComandoRenovacao implements Comando<Emprestimo> {
     @Override
     public Instant instanteCriacao() {
         return instanteCriacao;
-    }
-
-    @Override
-    public Emprestimo executar() {
-        return fachada.registrarRenovacao(idLivro, idTransacao);
     }
 
     @Override

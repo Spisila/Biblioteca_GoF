@@ -3,7 +3,6 @@ package br.pucpr.biblioteca.cadastro;
 import br.pucpr.biblioteca.comum.excecoes.PreRequisitoNaoAtendidoException;
 import br.pucpr.biblioteca.rh.pessoa.Pessoa;
 import br.pucpr.biblioteca.academico.estudante.Estudante;
-import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -17,19 +16,23 @@ public final class CadastroEstudante<T extends RegistroCadastravel> extends Temp
     private final RepositorioCadastro<T> repositorio;
     private final Predicate<T> preRequisito;
     private final RepositorioCadastro<? extends RegistroCadastravel> pessoas;
+    private final Class<T> tipo;
 
     public CadastroEstudante(RepositorioCadastro<T> repositorio, Predicate<T> preRequisito) {
         this.repositorio = Objects.requireNonNull(repositorio);
         this.preRequisito = Objects.requireNonNull(preRequisito);
         this.pessoas = null;
+        this.tipo = null;
     }
 
     public CadastroEstudante(
             RepositorioCadastro<T> repositorio,
-            RepositorioCadastro<? extends RegistroCadastravel> pessoas) {
+            RepositorioCadastro<? extends RegistroCadastravel> pessoas,
+            Class<T> tipo) {
         this.repositorio = Objects.requireNonNull(repositorio);
         this.pessoas = Objects.requireNonNull(pessoas);
         this.preRequisito = null;
+        this.tipo = Objects.requireNonNull(tipo);
     }
 
     public Optional<T> consultarPorId(String id) {
@@ -80,7 +83,7 @@ public final class CadastroEstudante<T extends RegistroCadastravel> extends Temp
     protected T criarRegistro(T dados) {
         if (pessoas != null && dados instanceof Estudante estudante) {
             Pessoa pessoa = (Pessoa) pessoas.buscarPorCpf(estudante.cpf()).orElseThrow();
-            return (T) new Estudante(
+            return tipo.cast(new Estudante(
                     pessoa.id(),
                     pessoa.nome(),
                     pessoa.cpf(),
@@ -88,7 +91,7 @@ public final class CadastroEstudante<T extends RegistroCadastravel> extends Temp
                     estudante.numeroMatricula(),
                     estudante.curso(),
                     estudante.limiteEmprestimos(),
-                    pessoa.dataNascimento());
+                    pessoa.dataNascimento()));
         }
         return dados;
     }

@@ -2,7 +2,6 @@ package br.pucpr.biblioteca.biblioteca.livro.estado;
 
 import br.pucpr.biblioteca.biblioteca.livro.Livro;
 import br.pucpr.biblioteca.biblioteca.livro.SituacaoLivro;
-import br.pucpr.biblioteca.biblioteca.movimentacao.Emprestimo;
 import br.pucpr.biblioteca.comum.excecoes.OperacaoRecusadaException;
 
 /**
@@ -41,3 +40,5 @@ public final class EstadoLivre extends EstadoLivroBase {
         }
     }
 }
+
+

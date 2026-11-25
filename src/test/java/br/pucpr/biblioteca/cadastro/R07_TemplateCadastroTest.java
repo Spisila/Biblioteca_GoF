@@ -20,13 +20,14 @@ import org.junit.jupiter.api.Test;
 class R07_TemplateCadastroTest {
     @Test
     void R07_cpfCadastradoCriaEstudanteComMesmoIdDaPessoa() {
-        RepositorioCadastroMemoria<Pessoa> pessoas = new RepositorioCadastroMemoria<>();
-        RepositorioCadastroMemoria<Estudante> estudantes = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroMemoria<Pessoa> pessoas = new RepositorioCadastroMemoria<>(Pessoa.class);
+        RepositorioCadastroMemoria<Estudante> estudantes =
+                new RepositorioCadastroMemoria<>(Estudante.class);
         CadastroPessoa<Pessoa> cadastroPessoa = new CadastroPessoa<>(pessoas);
         Pessoa pessoa = cadastroPessoa.incluir(new Pessoa(
                 "Ana", "12345678901", "ana@teste", LocalDate.of(2000, 1, 1)));
         CadastroEstudante<Estudante> cadastroEstudante =
-                new CadastroEstudante<>(estudantes, pessoas);
+                new CadastroEstudante<>(estudantes, pessoas, Estudante.class);
 
         Estudante estudante = cadastroEstudante.incluir(new Estudante(
                 "", "Ana", "12345678901", "ana@teste",
@@ -37,10 +38,11 @@ class R07_TemplateCadastroTest {
 
     @Test
     void R07_cpfInexistenteNaoGeraPessoaOuEstudante() {
-        RepositorioCadastroMemoria<Pessoa> pessoas = new RepositorioCadastroMemoria<>();
-        RepositorioCadastroMemoria<Estudante> estudantes = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroMemoria<Pessoa> pessoas = new RepositorioCadastroMemoria<>(Pessoa.class);
+        RepositorioCadastroMemoria<Estudante> estudantes =
+                new RepositorioCadastroMemoria<>(Estudante.class);
         CadastroEstudante<Estudante> cadastro =
-                new CadastroEstudante<>(estudantes, pessoas);
+                new CadastroEstudante<>(estudantes, pessoas, Estudante.class);
 
         assertThrows(PreRequisitoNaoAtendidoException.class,
                 () -> cadastro.incluir(new Estudante(
@@ -52,12 +54,13 @@ class R07_TemplateCadastroTest {
 
     @Test
     void R07_estudanteDuplicadoPorCpfRetornaExistente() {
-        RepositorioCadastroMemoria<Pessoa> pessoas = new RepositorioCadastroMemoria<>();
-        RepositorioCadastroMemoria<Estudante> estudantes = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroMemoria<Pessoa> pessoas = new RepositorioCadastroMemoria<>(Pessoa.class);
+        RepositorioCadastroMemoria<Estudante> estudantes =
+                new RepositorioCadastroMemoria<>(Estudante.class);
         Pessoa pessoa = new CadastroPessoa<Pessoa>(pessoas).incluir(new Pessoa(
                 "Ana", "12345678901", "ana@teste", LocalDate.of(2000, 1, 1)));
         CadastroEstudante<Estudante> cadastro =
-                new CadastroEstudante<>(estudantes, pessoas);
+                new CadastroEstudante<>(estudantes, pessoas, Estudante.class);
         Estudante original = cadastro.incluir(new Estudante(
                 "", "Ana", "12345678901", "ana@teste",
                 "2026001", "BCC", 5, LocalDate.of(2000, 1, 1)));

@@ -16,19 +16,23 @@ public final class CadastroAtendente<T extends RegistroCadastravel> extends Temp
     private final RepositorioCadastro<T> repositorio;
     private final Predicate<T> preRequisito;
     private final RepositorioCadastro<? extends RegistroCadastravel> pessoas;
+    private final Class<T> tipo;
 
     public CadastroAtendente(RepositorioCadastro<T> repositorio, Predicate<T> preRequisito) {
         this.repositorio = Objects.requireNonNull(repositorio);
         this.preRequisito = Objects.requireNonNull(preRequisito);
         this.pessoas = null;
+        this.tipo = null;
     }
 
     public CadastroAtendente(
             RepositorioCadastro<T> repositorio,
-            RepositorioCadastro<? extends RegistroCadastravel> pessoas) {
+            RepositorioCadastro<? extends RegistroCadastravel> pessoas,
+            Class<T> tipo) {
         this.repositorio = Objects.requireNonNull(repositorio);
         this.pessoas = Objects.requireNonNull(pessoas);
         this.preRequisito = null;
+        this.tipo = Objects.requireNonNull(tipo);
     }
 
     public Optional<T> consultarPorId(String id) {
@@ -66,14 +70,14 @@ public final class CadastroAtendente<T extends RegistroCadastravel> extends Temp
     protected T criarRegistro(T dados) {
         if (pessoas != null && dados instanceof Atendente atendente) {
             Pessoa pessoa = (Pessoa) pessoas.buscarPorCpf(atendente.cpf()).orElseThrow();
-            return (T) new Atendente(
+            return tipo.cast(new Atendente(
                     pessoa.id(),
                     pessoa.nome(),
                     pessoa.cpf(),
                     pessoa.email(),
                     atendente.turno(),
                     atendente.registroFuncional(),
-                    pessoa.dataNascimento());
+                    pessoa.dataNascimento()));
         }
         return dados;
     }

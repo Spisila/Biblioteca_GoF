@@ -1,9 +1,6 @@
 package br.pucpr.biblioteca.persistencia.relacional;
 
 import br.pucpr.biblioteca.persistencia.fabrica.FabricaPersistencia;
-import br.pucpr.biblioteca.persistencia.fabrica.RepositorioLivro;
-import br.pucpr.biblioteca.persistencia.fabrica.RepositorioMovimentacao;
-import br.pucpr.biblioteca.persistencia.fabrica.RepositorioRelacionamento;
 import br.pucpr.biblioteca.persistencia.fabrica.UnidadeDeTrabalho;
 
 /**

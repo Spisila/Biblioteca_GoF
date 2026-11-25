@@ -35,6 +35,11 @@ public final class ComandoReserva implements Comando<Livro> {
     }
 
     @Override
+    public Livro executar() {
+        return fachada.solicitarReserva(idComando, idLivro, idEstudante);
+    }
+
+    @Override
     public String idComando() {
         return idComando;
     }
@@ -47,11 +52,6 @@ public final class ComandoReserva implements Comando<Livro> {
     @Override
     public Instant instanteCriacao() {
         return instanteCriacao;
-    }
-
-    @Override
-    public Livro executar() {
-        return fachada.solicitarReserva(idComando, idLivro, idEstudante);
     }
 
     @Override

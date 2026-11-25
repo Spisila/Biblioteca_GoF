@@ -14,7 +14,6 @@ import java.time.LocalDate;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import br.pucpr.biblioteca.circulacao.comando.ComandoReserva;
 import org.junit.jupiter.api.Test;
 
 // Cenário R6: validar a execução idempotente de comandos de circulação.

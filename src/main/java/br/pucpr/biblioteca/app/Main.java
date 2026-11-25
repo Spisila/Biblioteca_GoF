@@ -15,8 +15,6 @@ import br.pucpr.biblioteca.devolucao.ouvintes.OuvinteInspecaoExemplar;
 import br.pucpr.biblioteca.devolucao.ouvintes.OuvinteMulta;
 import br.pucpr.biblioteca.devolucao.publicador.PublicadorDevolucao;
 import br.pucpr.biblioteca.financeiro.multa.EmissorMulta;
-import br.pucpr.biblioteca.financeiro.cobranca.adaptador.AdaptadorBancoA;
-import br.pucpr.biblioteca.financeiro.cobranca.bancossimulados.BancoASimulado;
 import br.pucpr.biblioteca.financeiro.cobranca.contrato.ServicoCobranca;
 import br.pucpr.biblioteca.rh.atendente.Atendente;
 import br.pucpr.biblioteca.rh.pessoa.Pessoa;
@@ -42,9 +40,12 @@ public class Main {
                 new CadastroLivro(repositorioLivro),
                 Configuracao.consulta(new ServicoConsultaOriginal(repositorioLivro)));
 
-        RepositorioCadastroMemoria<Pessoa> pessoasMemoria = new RepositorioCadastroMemoria<>();
-        RepositorioCadastroMemoria<Estudante> estudantesMemoria = new RepositorioCadastroMemoria<>();
-        RepositorioCadastroMemoria<Atendente> atendentesMemoria = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroMemoria<Pessoa> pessoasMemoria =
+                new RepositorioCadastroMemoria<>(Pessoa.class);
+        RepositorioCadastroMemoria<Estudante> estudantesMemoria =
+                new RepositorioCadastroMemoria<>(Estudante.class);
+        RepositorioCadastroMemoria<Atendente> atendentesMemoria =
+                new RepositorioCadastroMemoria<>(Atendente.class);
         RepositorioCadastroPorOperacao<Pessoa> pessoas =
                 new RepositorioCadastroPorOperacao<>(
                         fabrica, pessoasMemoria, Pessoa.class);
@@ -57,9 +58,9 @@ public class Main {
         TratadorDePessoa<Pessoa> tratadorPessoa = new TratadorDePessoa<>(
                 new CadastroPessoa<>(pessoas));
         TratadorDeEstudante<Estudante> tratadorEstudante = new TratadorDeEstudante<>(
-                new CadastroEstudante<>(estudantes, pessoas));
+                new CadastroEstudante<>(estudantes, pessoas, Estudante.class));
         TratadorDeAtendente<Atendente> tratadorAtendente = new TratadorDeAtendente<>(
-                new CadastroAtendente<>(atendentes, pessoas));
+                new CadastroAtendente<>(atendentes, pessoas, Atendente.class));
 
         EmissorMulta emissorMulta = new EmissorMulta(Configuracao.politicaMulta());
         ServicoCobranca servicoCobranca = new ServicoCobranca(Configuracao.cobranca());

@@ -50,9 +50,11 @@ class ConsoleBibliotecaTest {
     void demonstracaoMostraCadaEtapaEConcluiFluxoComMulta() {
         FabricaPersistencia fabrica = new FabricaPersistenciaMemoria();
         RepositorioLivro repositorioLivro = new RepositorioLivroDeTeste(fabrica);
-        RepositorioCadastroMemoria<Pessoa> pessoas = new RepositorioCadastroMemoria<>();
-        RepositorioCadastroMemoria<Estudante> estudantes = new RepositorioCadastroMemoria<>();
-        RepositorioCadastroMemoria<Atendente> atendentes = new RepositorioCadastroMemoria<>();
+        RepositorioCadastroMemoria<Pessoa> pessoas = new RepositorioCadastroMemoria<>(Pessoa.class);
+        RepositorioCadastroMemoria<Estudante> estudantes =
+                new RepositorioCadastroMemoria<>(Estudante.class);
+        RepositorioCadastroMemoria<Atendente> atendentes =
+                new RepositorioCadastroMemoria<>(Atendente.class);
         EmissorMulta emissor = new EmissorMulta();
         ServicoCobranca cobranca = new ServicoCobranca(
                 new AdaptadorBancoA(new BancoASimulado()));
@@ -72,8 +74,10 @@ class ConsoleBibliotecaTest {
         ConsoleBiblioteca console = new ConsoleBiblioteca(
                 tratadorAcervo,
                 new TratadorDePessoa<>(new CadastroPessoa<>(pessoas)),
-                new TratadorDeEstudante<>(new CadastroEstudante<>(estudantes, pessoas)),
-                new TratadorDeAtendente<>(new CadastroAtendente<>(atendentes, pessoas)),
+                new TratadorDeEstudante<>(
+                        new CadastroEstudante<>(estudantes, pessoas, Estudante.class)),
+                new TratadorDeAtendente<>(
+                        new CadastroAtendente<>(atendentes, pessoas, Atendente.class)),
                 new TratadorDeEmprestimo(fachada, new ExecutorComando()),
                 new TratadorDeDevolucao(fachada),
                 new TratadorDeMulta(emissor),

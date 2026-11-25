@@ -1,6 +1,5 @@
 package br.pucpr.biblioteca.biblioteca.livro.estado;
 
-import br.pucpr.biblioteca.biblioteca.livro.Livro;
 import br.pucpr.biblioteca.biblioteca.livro.SituacaoLivro;
 
 /**

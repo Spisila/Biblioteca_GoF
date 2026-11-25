@@ -2,7 +2,6 @@ package br.pucpr.biblioteca.persistencia.relacional;
 
 import br.pucpr.biblioteca.biblioteca.livro.Livro;
 import br.pucpr.biblioteca.persistencia.fabrica.RepositorioLivro;
-import br.pucpr.biblioteca.persistencia.fabrica.UnidadeDeTrabalho;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;

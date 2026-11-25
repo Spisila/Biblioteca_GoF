@@ -3,10 +3,10 @@ package br.pucpr.biblioteca.app;
 import br.pucpr.biblioteca.cadastro.RegistroCadastravel;
 import br.pucpr.biblioteca.cadastro.RepositorioCadastro;
 import java.util.Optional;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.UUID;
+import java.util.Objects;
 import br.pucpr.biblioteca.academico.estudante.Estudante;
 import br.pucpr.biblioteca.rh.atendente.Atendente;
 import br.pucpr.biblioteca.rh.pessoa.Pessoa;
@@ -17,8 +17,10 @@ import br.pucpr.biblioteca.rh.pessoa.Pessoa;
 public final class RepositorioCadastroMemoria<T extends RegistroCadastravel>
         implements RepositorioCadastro<T> {
     private final ConcurrentMap<String, T> registros = new ConcurrentHashMap<>();
+    private final Class<T> tipo;
 
-    public RepositorioCadastroMemoria() {
+    public RepositorioCadastroMemoria(Class<T> tipo) {
+        this.tipo = Objects.requireNonNull(tipo);
     }
 
     @Override
@@ -44,24 +46,25 @@ public final class RepositorioCadastroMemoria<T extends RegistroCadastravel>
             return registro;
         }
         if (registro instanceof Pessoa pessoa) {
-            T persistido;
+            RegistroCadastravel persistido;
             if (pessoa instanceof Estudante estudante) {
-                persistido = (T) new Estudante(
+                persistido = new Estudante(
                         "E-" + UUID.randomUUID(), estudante.nome(), estudante.cpf(),
                         estudante.email(), estudante.numeroMatricula(), estudante.curso(),
                         estudante.limiteEmprestimos(), estudante.dataNascimento());
             } else if (pessoa instanceof Atendente atendente) {
-                persistido = (T) new Atendente(
+                persistido = new Atendente(
                         "A-" + UUID.randomUUID(), atendente.nome(), atendente.cpf(),
                         atendente.email(), atendente.turno(), atendente.registroFuncional(),
                         atendente.dataNascimento());
             } else {
-                persistido = (T) new Pessoa(
+                persistido = new Pessoa(
                         "P-" + UUID.randomUUID(), pessoa.nome(), pessoa.cpf(),
                         pessoa.email(), pessoa.dataNascimento());
             }
-            registros.put(persistido.id(), persistido);
-            return persistido;
+            T persistidoTipado = tipo.cast(persistido);
+            registros.put(persistidoTipado.id(), persistidoTipado);
+            return persistidoTipado;
         }
         throw new IllegalArgumentException("Registro sem ID nao pode ser persistido em memoria");
     }

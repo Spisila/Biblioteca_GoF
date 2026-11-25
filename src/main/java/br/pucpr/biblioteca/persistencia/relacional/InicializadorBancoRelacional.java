@@ -108,51 +108,6 @@ final class InicializadorBancoRelacional {
         // ou conversao invalida de IDs ja utilizados.
     }
 
-    private static void migrarChavesNumericas(Connection conexao) throws SQLException {
-        try (Statement statement = conexao.createStatement()) {
-            if (tabelaExiste(conexao, "movimentacoes")) {
-                statement.execute(
-                        "ALTER TABLE movimentacoes "
-                                + "MODIFY id_livro BIGINT UNSIGNED NOT NULL");
-                statement.execute(
-                        "ALTER TABLE movimentacoes "
-                                + "MODIFY id_estudante BIGINT UNSIGNED NOT NULL");
-            }
-            if (tabelaExiste(conexao, "reservas")) {
-                statement.execute(
-                        "ALTER TABLE reservas "
-                                + "MODIFY id_livro BIGINT UNSIGNED NOT NULL");
-                statement.execute(
-                        "ALTER TABLE reservas "
-                                + "MODIFY id_estudante BIGINT UNSIGNED NOT NULL");
-            }
-        } catch (SQLException excecao) {
-            throw UnidadeDeTrabalhoRelacional.falha(
-                    "Nao foi possivel migrar as chaves numericas de circulacao", excecao);
-        }
-    }
-
-    private static void migrarAutoIncremento(
-            Connection conexao,
-            String tabela,
-            String coluna) throws SQLException {
-        if (!tabelaExiste(conexao, tabela)) {
-            return;
-        }
-        try (Statement statement = conexao.createStatement()) {
-            statement.execute(
-                    "ALTER TABLE " + tabela
-                            + " MODIFY " + coluna
-                            + " BIGINT UNSIGNED NOT NULL"
-                            + (tabela.equals("livros") || tabela.equals("pessoas")
-                            ? " AUTO_INCREMENT" : ""));
-        } catch (SQLException excecao) {
-            throw UnidadeDeTrabalhoRelacional.falha(
-                    "Nao foi possivel migrar o ID automatico da tabela " + tabela,
-                    excecao);
-        }
-    }
-
     private static boolean colunaExiste(
             Connection conexao,
             String tabela,

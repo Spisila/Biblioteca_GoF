@@ -1,7 +1,6 @@
 package br.pucpr.biblioteca.biblioteca.acervo.composite;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Folha que referencia um livro sem assumir sua propriedade.
