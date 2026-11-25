@@ -63,8 +63,15 @@ public final class TratadorDeAcervo {
 
     public String consultar(String idLivro) {
         return consulta.consultarPorId(idLivro)
-                .map(metadados -> metadados.id() + " - "
-                        + metadados.titulo() + " (" + metadados.situacao() + ")")
+                .map(metadados -> "Livro encontrado: ID=" + metadados.id()
+                        + " | Titulo=" + metadados.titulo()
+                        + " | Situacao=" + metadados.situacao()
+                        + " | Reservado para=" + texto(metadados.reservadoPara())
+                        + " | Data de devolucao=" + texto(metadados.dataDevolucao()))
                 .orElse("Livro nao encontrado: " + idLivro);
+    }
+
+    private String texto(Object valor) {
+        return valor == null ? "-" : valor.toString();
     }
 }

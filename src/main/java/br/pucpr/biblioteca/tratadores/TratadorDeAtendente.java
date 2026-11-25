@@ -3,6 +3,7 @@ package br.pucpr.biblioteca.tratadores;
 import br.pucpr.biblioteca.cadastro.CadastroAtendente;
 import br.pucpr.biblioteca.cadastro.RegistroCadastravel;
 import br.pucpr.biblioteca.comum.excecoes.BibliotecaException;
+import br.pucpr.biblioteca.rh.atendente.Atendente;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,7 +28,18 @@ public final class TratadorDeAtendente<T extends RegistroCadastravel> {
 
     public String consultar(String id) {
         return cadastro.consultarPorId(id)
-                .map(registro -> "Atendente encontrado: " + registro.id())
+                .map(registro -> {
+                    if (registro instanceof Atendente atendente) {
+                        return "Atendente encontrado: ID=" + atendente.id()
+                                + " | Nome=" + atendente.nome()
+                                + " | CPF=" + atendente.cpf()
+                                + " | E-mail=" + atendente.email()
+                                + " | Data de nascimento=" + atendente.dataNascimento()
+                                + " | Turno=" + atendente.turno()
+                                + " | Registro funcional=" + atendente.registroFuncional();
+                    }
+                    return "Atendente encontrado: " + registro.id();
+                })
                 .orElse("Atendente nao encontrado: " + id);
     }
 

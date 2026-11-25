@@ -32,6 +32,11 @@ public final class ServicoConsultaOriginal implements ServicoConsulta {
     }
 
     private static MetadadosLivro metadados(Livro livro) {
-        return new MetadadosLivro(livro.id(), livro.titulo(), livro.situacao());
+        return new MetadadosLivro(
+                livro.id(),
+                livro.titulo(),
+                livro.situacao(),
+                livro.reservadoPara(),
+                livro.dataDevolucao());
     }
 }

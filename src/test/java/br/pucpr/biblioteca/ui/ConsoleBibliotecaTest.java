@@ -47,7 +47,7 @@ import org.junit.jupiter.api.Test;
 
 class ConsoleBibliotecaTest {
     @Test
-    void demonstracaoMostraCadaEtapaEConcluiFluxoComMulta() {
+    void consultasEListagensMostramDadosCompletosEFluxoConcluiComMulta() {
         FabricaPersistencia fabrica = new FabricaPersistenciaMemoria();
         RepositorioLivro repositorioLivro = new RepositorioLivroDeTeste(fabrica);
         RepositorioCadastroMemoria<Pessoa> pessoas = new RepositorioCadastroMemoria<>(Pessoa.class);
@@ -55,6 +55,15 @@ class ConsoleBibliotecaTest {
                 new RepositorioCadastroMemoria<>(Estudante.class);
         RepositorioCadastroMemoria<Atendente> atendentes =
                 new RepositorioCadastroMemoria<>(Atendente.class);
+        pessoas.salvar(new Pessoa(
+                "P-CONSULTA", "Nome Pessoa", "11111111111", "pessoa@example.com",
+                LocalDate.of(1980, 2, 3)));
+        estudantes.salvar(new Estudante(
+                "E-CONSULTA", "Nome Estudante", "22222222222", "estudante@example.com",
+                "MAT-CONSULTA", "Biblioteconomia", 4, LocalDate.of(2000, 4, 5)));
+        atendentes.salvar(new Atendente(
+                "A-CONSULTA", "Nome Atendente", "33333333333", "atendente@example.com",
+                "Tarde", "RF-CONSULTA", LocalDate.of(1990, 6, 7)));
         EmissorMulta emissor = new EmissorMulta();
         ServicoCobranca cobranca = new ServicoCobranca(
                 new AdaptadorBancoA(new BancoASimulado()));
@@ -71,6 +80,7 @@ class ConsoleBibliotecaTest {
         TratadorDeAcervo tratadorAcervo = new TratadorDeAcervo(
                 new CadastroLivro(repositorioLivro),
                 new ServicoConsultaOriginal(repositorioLivro));
+        tratadorAcervo.cadastrar("L-CONSULTA", "Livro para consulta");
         String livroReservado = tratadorAcervo.cadastrar("Livro reservado para listagem")
                 .substring("Livro cadastrado: ".length());
         fachada.solicitarReserva("R-TABELA", livroReservado, "E-TABELA");
@@ -84,7 +94,8 @@ class ConsoleBibliotecaTest {
                 new TratadorDeEmprestimo(fachada, new ExecutorComando()),
                 new TratadorDeDevolucao(fachada),
                 new TratadorDeMulta(emissor),
-                new Scanner("D\n14\n15\n16\n17\n18\n19\n0\n"),
+                new Scanner("5\nP-CONSULTA\n6\nE-CONSULTA\n7\nA-CONSULTA\n"
+                        + "8\nL-CONSULTA\nD\n14\n15\n16\n17\n18\n19\n0\n"),
                 0);
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         PrintStream saidaOriginal = System.out;
@@ -97,6 +108,19 @@ class ConsoleBibliotecaTest {
         }
 
         String saida = bytes.toString(StandardCharsets.UTF_8);
+        assertTrue(saida.contains("Nome=Nome Pessoa"));
+        assertTrue(saida.contains("CPF=11111111111"));
+        assertTrue(saida.contains("Data de nascimento=1980-02-03"));
+        assertTrue(saida.contains("Matricula=MAT-CONSULTA"));
+        assertTrue(saida.contains("Curso=Biblioteconomia"));
+        assertTrue(saida.contains("Limite de emprestimos=4"));
+        assertTrue(saida.contains("Turno=Tarde"));
+        assertTrue(saida.contains("Registro funcional=RF-CONSULTA"));
+        assertTrue(saida.contains("ID=L-CONSULTA"));
+        assertTrue(saida.contains("Titulo=Livro para consulta"));
+        assertTrue(saida.contains("Situacao=LIVRE"));
+        assertTrue(saida.contains("Reservado para=-"));
+        assertTrue(saida.contains("Data de devolucao=-"));
         for (int etapa = 1; etapa <= 10; etapa++) {
             assertTrue(saida.contains("[" + etapa + "/10]"), "Etapa " + etapa + " nao exibida");
         }
