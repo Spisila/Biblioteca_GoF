@@ -71,10 +71,11 @@ No Windows:
 O menu permite cadastrar e consultar pessoas, estudantes, atendentes e livros,
 solicitar reservas, efetivar empréstimos, renovar empréstimos, registrar
 devoluções e emitir multas. A opção `D` executa um fluxo demonstrativo
-guiado em dez etapas, apresentando cada cadastro e operação com uma pausa curta
-entre as ações. A demonstração inclui duas renovações e uma devolução atrasada,
-mostrando também a notificação dos ouvintes e a emissão da multa. A opção `14`
-lista o catálogo com os estados atuais dos livros.
+guiado em treze etapas, apresentando cada cadastro e operação com uma pausa curta
+entre as ações e consultando os registros após as operações. O fluxo também cria
+categorias e subcategorias, associa e lista livros recursivamente, inclui duas
+renovações e uma devolução atrasada, mostrando a notificação dos ouvintes e a
+emissão da multa. A opção `14` lista o catálogo com os estados atuais dos livros.
 
 Para usar persistência em memória:
 

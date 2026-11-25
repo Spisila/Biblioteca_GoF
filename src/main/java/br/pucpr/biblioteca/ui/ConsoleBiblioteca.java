@@ -488,95 +488,206 @@ public final class ConsoleBiblioteca {
     }
 
     private void demonstrarFluxo() {
-        secao("DEMONSTRACAO GUIADA", "Reserva -> emprestimo -> renovacoes -> devolucao atrasada");
+        secao("DEMONSTRACAO GUIADA",
+                "Cadastros -> categorias -> emprestimo -> renovacoes -> devolucao atrasada");
         System.out.println("  Cada pausa separa as etapas para facilitar a leitura.");
         pausaDemonstracao();
 
+        int total = 13;
         String cpfEstudante = cpfDemonstracao();
         String cpfAtendente = cpfDemonstracao();
-        String resultadoPessoaEstudante = executarEtapa(1, 10,
+        String resultadoPessoaEstudante = executarEtapa(1, total,
                 "Preparando o cadastro base do estudante",
-                "Primeiro cadastramos a Pessoa que sera associada pelo CPF.",
-                () -> pessoa.cadastrar(new Pessoa(
-                        "Pessoa demonstracao", cpfEstudante, "demo@example.com",
-                        LocalDate.of(1990, 1, 1))));
+                "Cadastramos a Pessoa e consultamos o registro pelo identificador retornado.",
+                () -> {
+                    String resultado = pessoa.cadastrar(new Pessoa(
+                            "Pessoa demonstracao", cpfEstudante, "demo@example.com",
+                            LocalDate.of(1990, 1, 1)));
+                    String id = idGerado(resultado, "Pessoa cadastrada:");
+                    return consultaImediata(resultado, pessoa.consultar(id));
+                });
         String idPessoaEstudante = idGerado(resultadoPessoaEstudante, "Pessoa cadastrada:");
 
-        String resultadoEstudante = executarEtapa(2, 10,
+        String resultadoEstudante = executarEtapa(2, total,
                 "Cadastrando estudante",
-                "O CPF corresponde a Pessoa anterior; o cadastro reutiliza o mesmo identificador.",
-                () -> estudante.cadastrar(new Estudante(
-                        "Estudante demonstracao", cpfEstudante, "demo@example.com",
-                        LocalDate.of(2000, 1, 1), "MAT-DEMO-" + sufixo(),
-                        "Sistemas", 5)));
+                "O CPF reutiliza a Pessoa anterior; depois consultamos o estudante cadastrado.",
+                () -> {
+                    String resultado = estudante.cadastrar(new Estudante(
+                            "Estudante demonstracao", cpfEstudante, "demo@example.com",
+                            LocalDate.of(2000, 1, 1), "MAT-DEMO-" + sufixo(),
+                            "Sistemas", 5));
+                    String id = idGerado(resultado, "Estudante cadastrado:");
+                    return consultaImediata(resultado, estudante.consultar(id));
+                });
         String idEstudante = idGerado(resultadoEstudante, "Estudante cadastrado:");
         if (!idPessoaEstudante.equals(idEstudante)) {
             throw new IllegalStateException("Pessoa e estudante receberam identificadores diferentes");
         }
 
-        executarEtapa(3, 10,
+        String resultadoPessoaAtendente = executarEtapa(3, total,
                 "Cadastrando a Pessoa do atendente",
-                "O cadastro de atendente tambem exige uma Pessoa previamente existente.",
-                () -> pessoa.cadastrar(new Pessoa(
-                        "Pessoa atendente demonstracao", cpfAtendente, "atendente@example.com",
-                        LocalDate.of(1985, 1, 1))));
-        executarEtapa(4, 10,
-                "Cadastrando atendente",
-                "A conta funcional passa a usar o cadastro de Pessoa feito no passo anterior.",
-                () -> atendente.cadastrar(new Atendente(
-                        "Atendente demonstracao", cpfAtendente, "atendente@example.com",
-                        LocalDate.of(1985, 1, 1), "Integral", "RF-DEMO-" + sufixo())));
+                "Criamos a Pessoa que sera vinculada ao atendente e consultamos seus dados.",
+                () -> {
+                    String resultado = pessoa.cadastrar(new Pessoa(
+                            "Pessoa atendente demonstracao", cpfAtendente, "atendente@example.com",
+                            LocalDate.of(1985, 1, 1)));
+                    String id = idGerado(resultado, "Pessoa cadastrada:");
+                    return consultaImediata(resultado, pessoa.consultar(id));
+                });
+        String idPessoaAtendente = idGerado(
+                resultadoPessoaAtendente, "Pessoa cadastrada:");
 
-        String resultadoLivro = executarEtapa(5, 10,
+        String resultadoAtendente = executarEtapa(4, total,
+                "Cadastrando atendente",
+                "O CPF vincula o atendente a Pessoa; em seguida consultamos o cadastro.",
+                () -> {
+                    String resultado = atendente.cadastrar(new Atendente(
+                            "Atendente demonstracao", cpfAtendente, "atendente@example.com",
+                            LocalDate.of(1985, 1, 1), "Integral", "RF-DEMO-" + sufixo()));
+                    String id = idGerado(resultado, "Atendente cadastrado:");
+                    return consultaImediata(resultado, atendente.consultar(id));
+                });
+        String idAtendente = idGerado(resultadoAtendente, "Atendente cadastrado:");
+
+        String resultadoLivro = executarEtapa(5, total,
                 "Incluindo livro no acervo",
-                "Um novo exemplar e cadastrado no estado inicial LIVRE.",
-                () -> acervo.cadastrar("Livro demonstracao " + sufixo()));
+                "Cadastramos o livro e consultamos seus metadados iniciais.",
+                () -> {
+                    String resultado = acervo.cadastrar("Livro demonstracao " + sufixo());
+                    String id = idGerado(resultado, "Livro cadastrado:");
+                    return consultaImediata(resultado, acervo.consultar(id));
+                });
         String idLivro = idGerado(resultadoLivro, "Livro cadastrado:");
 
+        String idCategoria = "CAT-DEMO-" + sufixo();
+        String nomeCategoria = "Colecao demonstracao " + sufixo();
+        executarEtapa(6, total,
+                "Criando categoria",
+                "Criamos uma categoria na raiz e consultamos a hierarquia atual.",
+                () -> {
+                    String resultado = acervo.criarCategoria(
+                            idCategoria, "", nomeCategoria);
+                    return consultaCategoriasImediata(
+                            resultado, idCategoria, nomeCategoria);
+                });
+
+        String idSubcategoria = "SUB-DEMO-" + sufixo();
+        String nomeSubcategoria = "Fantasia demonstracao " + sufixo();
+        executarEtapa(7, total,
+                "Criando subcategoria",
+                "Adicionamos uma subcategoria e consultamos novamente a arvore.",
+                () -> {
+                    String resultado = acervo.criarCategoria(
+                            idSubcategoria, idCategoria, nomeSubcategoria);
+                    return consultaCategoriasImediata(
+                            resultado, idSubcategoria, nomeSubcategoria);
+                });
+
+        executarEtapa(8, total,
+                "Associando livro a subcategoria",
+                "Associamos o livro criado e consultamos os livros da categoria pai.",
+                () -> {
+                    String resultado = acervo.associarLivro(idLivro, idSubcategoria);
+                    return consultaImediata(
+                            resultado, consultaCategoriaDemonstrativa(idCategoria));
+                });
+
         String idReserva = "R-DEMO-" + sufixo();
-        executarEtapa(6, 10,
+        executarEtapa(9, total,
                 "Solicitando reserva",
-                "O tratador cria e encaminha um ComandoReserva ao executor idempotente.",
-                () -> emprestimo.reservar(idReserva, idLivro, idEstudante));
+                "O tratador encaminha um ComandoReserva; depois consultamos o estado do livro.",
+                () -> consultaImediata(
+                        emprestimo.reservar(idReserva, idLivro, idEstudante),
+                        acervo.consultar(idLivro)));
 
         String idTransacao = "T-DEMO-" + sufixo();
-        executarEtapa(7, 10,
+        executarEtapa(10, total,
                 "Efetivando o emprestimo",
-                "A fachada confirma a reserva, atualiza o livro e cria a movimentacao.",
+                "A fachada efetiva o emprestimo; consultamos o estado e a devolucao prevista.",
                 () -> {
                     String resultado = emprestimo.realizar(idTransacao, idLivro, idEstudante);
                     if (!resultado.startsWith("Empréstimo realizado:")) {
                         throw new IllegalStateException(resultado);
                     }
-                    return resultado;
+                    return consultaImediata(resultado, acervo.consultar(idLivro));
                 });
 
-        executarEtapa(8, 10,
+        executarEtapa(11, total,
                 "Executando a primeira renovacao",
-                "Um ComandoRenovacao idempotente estende o prazo por 30 dias.",
-                () -> renovarDemonstracao("CMD-DEMO-1-" + sufixo(), idLivro, idTransacao));
+                "Renovamos o emprestimo e consultamos a nova data de devolucao.",
+                () -> consultaImediata(
+                        renovarDemonstracao(
+                                "CMD-DEMO-1-" + sufixo(), idLivro, idTransacao),
+                        acervo.consultar(idLivro)));
 
-        executarEtapa(9, 10,
+        executarEtapa(12, total,
                 "Executando a segunda renovacao",
-                "Uma nova solicitacao distinta e permitida; o dominio bloqueia uma terceira.",
-                () -> renovarDemonstracao("CMD-DEMO-2-" + sufixo(), idLivro, idTransacao));
+                "Uma segunda renovacao e permitida; consultamos novamente o livro.",
+                () -> consultaImediata(
+                        renovarDemonstracao(
+                                "CMD-DEMO-2-" + sufixo(), idLivro, idTransacao),
+                        acervo.consultar(idLivro)));
 
         LocalDate dataDevolucao = LocalDate.now().plusDays(100);
-        executarEtapa(10, 10,
+        executarEtapa(13, total,
                 "Registrando devolucao atrasada",
-                "A devolucao e confirmada; depois, Observer aciona inspecao, multa, indicadores e e-mail.",
+                "Confirmamos a devolucao, consultamos o livro e notificamos os ouvintes.",
                 () -> {
                     boolean sucesso = devolucao.registrar(idLivro, idTransacao, dataDevolucao);
                     if (!sucesso) {
                         throw new IllegalStateException("A devolucao demonstrativa foi recusada");
                     }
-                    return "Devolucao registrada em " + dataDevolucao + "; ouvintes executados.";
+                    return consultaImediata(
+                            "Devolucao registrada em " + dataDevolucao
+                                    + "; ouvintes executados.",
+                            acervo.consultar(idLivro));
                 });
 
         secao("DEMONSTRACAO CONCLUIDA",
-                "Pessoa/estudante/atendente cadastrados; livro reservado, emprestado, renovado e devolvido.");
+                "Cadastros consultados; livro categorizado, emprestado, renovado e devolvido.");
         System.out.println("  Identificadores: pessoa/estudante=" + idEstudante
+                + ", pessoa atendente=" + idPessoaAtendente + ", atendente=" + idAtendente
+                + ", categoria=" + idCategoria + ", subcategoria=" + idSubcategoria
                 + ", livro=" + idLivro + ", emprestimo=" + idTransacao);
+    }
+
+    private String consultaImediata(String resultado, String consulta) {
+        if (consulta == null || consulta.toLowerCase().contains("nao encontrado")) {
+            throw new IllegalStateException(
+                    "A consulta demonstrativa nao encontrou o registro: " + consulta);
+        }
+        return resultado + System.lineSeparator() + "Consulta imediata: " + consulta;
+    }
+
+    private String consultaCategoriasImediata(
+            String resultado,
+            String idCategoria,
+            String nomeCategoria) {
+        String hierarquia = acervo.listarCategoriasComoTexto();
+        if (!hierarquia.contains(idCategoria + " - " + nomeCategoria)) {
+            throw new IllegalStateException(
+                    "A categoria nao foi encontrada na hierarquia: " + idCategoria);
+        }
+        return consultaImediata(resultado, "Hierarquia de categorias:"
+                + System.lineSeparator() + hierarquia);
+    }
+
+    private String consultaCategoriaDemonstrativa(String idCategoria) {
+        List<MetadadosLivro> livros = acervo.listarLivrosDaCategoria(idCategoria);
+        int quantidade = acervo.contarLivrosDaCategoria(idCategoria);
+        if (quantidade != livros.size()) {
+            throw new IllegalStateException(
+                    "A contagem da categoria nao corresponde a listagem.");
+        }
+        StringBuilder consulta = new StringBuilder("Consulta recursiva da categoria ")
+                .append(idCategoria).append(": ").append(quantidade).append(" livro(s)");
+        for (MetadadosLivro livro : livros) {
+            consulta.append(System.lineSeparator())
+                    .append("  ")
+                    .append(livro.id()).append(" - ").append(livro.titulo())
+                    .append(" (").append(livro.situacao()).append(')');
+        }
+        return consulta.toString();
     }
 
     private String executarEtapa(
@@ -596,7 +707,11 @@ public final class ConsoleBiblioteca {
             throw new IllegalStateException(
                     resultado == null ? "A operacao nao retornou um resultado." : resultado);
         }
-        System.out.println("      Resultado: " + resultado);
+        String[] linhasResultado = resultado.split("\\R", -1);
+        System.out.println("      Resultado: " + linhasResultado[0]);
+        for (int indice = 1; indice < linhasResultado.length; indice++) {
+            System.out.println("                 " + linhasResultado[indice]);
+        }
         pausaDemonstracao();
         return resultado;
     }
@@ -619,7 +734,8 @@ public final class ConsoleBiblioteca {
             throw new IllegalStateException(
                     "A demonstracao nao conseguiu continuar: " + mensagem);
         }
-        String id = mensagem.substring(prefixo.length()).trim();
+        String id = mensagem.substring(prefixo.length()).lines()
+                .findFirst().orElse("").trim();
         if (id.isEmpty()) {
             throw new IllegalStateException("O cadastro nao retornou um identificador.");
         }

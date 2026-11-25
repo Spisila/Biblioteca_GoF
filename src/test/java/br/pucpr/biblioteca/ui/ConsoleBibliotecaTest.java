@@ -132,8 +132,8 @@ class ConsoleBibliotecaTest {
         assertTrue(saida.contains("Situacao=LIVRE"));
         assertTrue(saida.contains("Reservado para=-"));
         assertTrue(saida.contains("Data de devolucao=-"));
-        for (int etapa = 1; etapa <= 10; etapa++) {
-            assertTrue(saida.contains("[" + etapa + "/10]"), "Etapa " + etapa + " nao exibida");
+        for (int etapa = 1; etapa <= 13; etapa++) {
+            assertTrue(saida.contains("[" + etapa + "/13]"), "Etapa " + etapa + " nao exibida");
         }
         assertTrue(saida.contains("DEMONSTRACAO CONCLUIDA"));
         assertTrue(saida.contains("Devolucao registrada"));
@@ -149,11 +149,15 @@ class ConsoleBibliotecaTest {
         assertTrue(saida.contains("Livro reservado para listagem"));
         assertTrue(saida.contains("ID do estudante"));
         assertTrue(saida.contains("T-DEMO-"));
+        assertTrue(saida.contains("Consulta imediata: Pessoa encontrada:"));
+        assertTrue(saida.contains("Consulta imediata: Estudante encontrado:"));
+        assertTrue(saida.contains("Consulta recursiva da categoria CAT-DEMO-"));
+        assertEquals(13, saida.split("Consulta imediata:", -1).length - 1);
         assertTrue(saida.contains("Quantidade de livros: 1"));
         assertTrue(saida.contains("CAT-FIC - Ficcao"));
         assertTrue(saida.contains("CAT-FANT - Fantasia"));
-        assertEquals(1, unidadeAcervo.contarElementos());
-        assertEquals(4, medicao.quantidadeConsultas());
+        assertEquals(2, unidadeAcervo.contarElementos());
+        assertEquals(12, medicao.quantidadeConsultas());
         assertTrue(!ouvinteMulta.multas().isEmpty());
     }
 
