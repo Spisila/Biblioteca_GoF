@@ -15,6 +15,39 @@ As regras de negócio permanecem nos objetos de domínio, especialmente em
 `Livro`, `Emprestimo` e suas estratégias/estados. A seleção da persistência é
 feita na composição da aplicação por `Configuracao`.
 
+## Árvore de arquivos por padrão
+
+Os marcadores R01–R10 correspondem às seções detalhadas abaixo:
+
+```text
+src/main/java/br/pucpr/biblioteca/
+├── app/                                          [R08 — seleção da fábrica]
+├── biblioteca/
+│   ├── acervo/
+│   │   ├── composite/                            [R10 — Composite]
+│   │   └── consulta/                             [R09 — Decorator]
+│   └── livro/
+│       └── estado/                               [R01 — State]
+├── cadastro/                                     [R07 — Template Method]
+├── circulacao/
+│   ├── comando/                                  [R06 — Command]
+│   └── facade/                                   [R04 — Facade]
+├── devolucao/
+│   ├── evento/                                   [R05 — Observer]
+│   ├── ouvintes/                                 [R05 — Observer]
+│   └── publicador/                               [R05 — Observer]
+├── financeiro/
+│   ├── cobranca/
+│   │   ├── adaptador/                            [R03 — Adapter]
+│   │   ├── bancossimulados/                       [R03 — Adapter]
+│   │   └── contrato/                             [R03 — Adapter]
+│   └── multa/                                    [R02 — Strategy]
+└── persistencia/
+    ├── fabrica/                                  [R08 — Abstract Factory]
+    ├── memoria/                                  [R08 — fábrica concreta]
+    └── relacional/                               [R08 — fábrica concreta]
+```
+
 ## R01 — State
 
 **Localização:** `biblioteca/livro` e `biblioteca/livro/estado`.

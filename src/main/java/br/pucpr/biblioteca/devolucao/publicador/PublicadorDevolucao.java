@@ -17,6 +17,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * <p>Padrão: R05 Observer — papel: Sujeito concreto.</p>
  */
 public final class PublicadorDevolucao {
+    
     private final List<OuvinteDevolucao> ouvintes = new CopyOnWriteArrayList<>();
     private final List<RuntimeException> falhasDosOuvintes = new CopyOnWriteArrayList<>();
 
