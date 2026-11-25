@@ -58,7 +58,7 @@ public final class Configuracao {
             consulta = new DecoratorCache(consulta);
         }
         if (Boolean.parseBoolean(propriedade(
-                "biblioteca.consulta.medicao", "BIBLIOTECA_CONSULTA_MEDICAO", "false"))) {
+                "biblioteca.consulta.medicao", "BIBLIOTECA_CONSULTA_MEDICAO", "true"))) {
             consulta = new DecoratorMedicao(consulta);
         }
         return consulta;

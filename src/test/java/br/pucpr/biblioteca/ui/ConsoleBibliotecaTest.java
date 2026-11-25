@@ -1,9 +1,11 @@
 package br.pucpr.biblioteca.ui;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import br.pucpr.biblioteca.academico.estudante.Estudante;
 import br.pucpr.biblioteca.app.RepositorioCadastroMemoria;
+import br.pucpr.biblioteca.biblioteca.acervo.consulta.DecoratorMedicao;
 import br.pucpr.biblioteca.biblioteca.acervo.consulta.ServicoConsultaOriginal;
 import br.pucpr.biblioteca.cadastro.CadastroAtendente;
 import br.pucpr.biblioteca.cadastro.CadastroEstudante;
@@ -77,9 +79,11 @@ class ConsoleBibliotecaTest {
                 fabrica,
                 new RelogioFixo(LocalDate.now(), Instant.now()),
                 publicador);
+        DecoratorMedicao medicao = new DecoratorMedicao(
+                new ServicoConsultaOriginal(repositorioLivro));
         TratadorDeAcervo tratadorAcervo = new TratadorDeAcervo(
                 new CadastroLivro(repositorioLivro),
-                new ServicoConsultaOriginal(repositorioLivro));
+                medicao);
         tratadorAcervo.cadastrar("L-CONSULTA", "Livro para consulta");
         String livroReservado = tratadorAcervo.cadastrar("Livro reservado para listagem")
                 .substring("Livro cadastrado: ".length());
@@ -138,6 +142,7 @@ class ConsoleBibliotecaTest {
         assertTrue(saida.contains("Livro reservado para listagem"));
         assertTrue(saida.contains("ID do estudante"));
         assertTrue(saida.contains("T-DEMO-"));
+        assertEquals(2, medicao.quantidadeConsultas());
         assertTrue(!ouvinteMulta.multas().isEmpty());
     }
 

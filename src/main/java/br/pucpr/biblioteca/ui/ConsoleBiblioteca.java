@@ -1,7 +1,7 @@
 package br.pucpr.biblioteca.ui;
 
 import br.pucpr.biblioteca.academico.estudante.Estudante;
-import br.pucpr.biblioteca.biblioteca.livro.Livro;
+import br.pucpr.biblioteca.biblioteca.acervo.consulta.MetadadosLivro;
 import br.pucpr.biblioteca.biblioteca.movimentacao.Emprestimo;
 import br.pucpr.biblioteca.biblioteca.movimentacao.Transacao;
 import br.pucpr.biblioteca.biblioteca.relacionamento.Reserva;
@@ -249,7 +249,7 @@ public final class ConsoleBiblioteca {
     private void listarAcervo() {
         cabecalho("Catalogo do acervo", "Lista todos os dados registrados para cada livro.");
         List<List<String>> linhas = new ArrayList<>();
-        for (Livro livro : acervo.listarLivros()) {
+        for (MetadadosLivro livro : acervo.listar()) {
             linhas.add(List.of(
                     livro.id(),
                     livro.titulo(),
