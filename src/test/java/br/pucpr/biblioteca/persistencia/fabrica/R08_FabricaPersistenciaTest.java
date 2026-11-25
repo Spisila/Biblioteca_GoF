@@ -9,16 +9,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import br.pucpr.biblioteca.app.Configuracao;
 import br.pucpr.biblioteca.app.PerfilExecucao;
+import br.pucpr.biblioteca.biblioteca.acervo.composite.UnidadeAcervo;
 import br.pucpr.biblioteca.biblioteca.livro.Livro;
 import br.pucpr.biblioteca.biblioteca.livro.SituacaoLivro;
 import br.pucpr.biblioteca.biblioteca.movimentacao.Emprestimo;
 import br.pucpr.biblioteca.biblioteca.relacionamento.Reserva;
 import br.pucpr.biblioteca.persistencia.memoria.FabricaPersistenciaMemoria;
+import br.pucpr.biblioteca.persistencia.memoria.RepositorioCategoriaMemoria;
 import br.pucpr.biblioteca.persistencia.memoria.RepositorioLivroMemoria;
 import br.pucpr.biblioteca.persistencia.memoria.RepositorioMovimentacaoMemoria;
 import br.pucpr.biblioteca.persistencia.memoria.RepositorioRelacionamentoMemoria;
 import br.pucpr.biblioteca.persistencia.memoria.UnidadeDeTrabalhoMemoria;
 import br.pucpr.biblioteca.persistencia.relacional.FabricaPersistenciaRelacional;
+import br.pucpr.biblioteca.persistencia.relacional.RepositorioCategoriaRelacional;
 import br.pucpr.biblioteca.persistencia.relacional.RepositorioLivroRelacional;
 import br.pucpr.biblioteca.persistencia.relacional.RepositorioMovimentacaoRelacional;
 import br.pucpr.biblioteca.persistencia.relacional.RepositorioRelacionamentoRelacional;
@@ -37,6 +40,7 @@ class R08_FabricaPersistenciaTest {
         assertInstanceOf(RepositorioLivroMemoria.class, fabrica.criarRepositorioLivro(unidade));
         assertInstanceOf(RepositorioMovimentacaoMemoria.class, fabrica.criarRepositorioMovimentacao(unidade));
         assertInstanceOf(RepositorioRelacionamentoMemoria.class, fabrica.criarRepositorioRelacionamento(unidade));
+        assertInstanceOf(RepositorioCategoriaMemoria.class, fabrica.criarRepositorioCategoria(unidade));
         unidade.rollback();
     }
 
@@ -49,11 +53,14 @@ class R08_FabricaPersistenciaTest {
         assertInstanceOf(RepositorioLivroRelacional.class, fabrica.criarRepositorioLivro(unidade));
         assertInstanceOf(RepositorioMovimentacaoRelacional.class, fabrica.criarRepositorioMovimentacao(unidade));
         assertInstanceOf(RepositorioRelacionamentoRelacional.class, fabrica.criarRepositorioRelacionamento(unidade));
+        assertInstanceOf(RepositorioCategoriaRelacional.class, fabrica.criarRepositorioCategoria(unidade));
         assertSame(unidade, ((RepositorioLivroRelacional) fabrica.criarRepositorioLivro(unidade))
                 .unidadeDeTrabalho());
         assertSame(unidade, ((RepositorioMovimentacaoRelacional) fabrica.criarRepositorioMovimentacao(unidade))
                 .unidadeDeTrabalho());
         assertSame(unidade, ((RepositorioRelacionamentoRelacional) fabrica.criarRepositorioRelacionamento(unidade))
+                .unidadeDeTrabalho());
+        assertSame(unidade, ((RepositorioCategoriaRelacional) fabrica.criarRepositorioCategoria(unidade))
                 .unidadeDeTrabalho());
     }
 
@@ -67,10 +74,33 @@ class R08_FabricaPersistenciaTest {
         assertThrows(IllegalArgumentException.class, () -> relacional.criarRepositorioLivro(unidadeMemoria));
         assertThrows(IllegalArgumentException.class, () -> relacional.criarRepositorioMovimentacao(unidadeMemoria));
         assertThrows(IllegalArgumentException.class, () -> relacional.criarRepositorioRelacionamento(unidadeMemoria));
+        assertThrows(IllegalArgumentException.class, () -> relacional.criarRepositorioCategoria(unidadeMemoria));
         assertThrows(IllegalArgumentException.class, () -> memoria.criarRepositorioLivro(unidadeRelacional));
         assertThrows(IllegalArgumentException.class, () -> memoria.criarRepositorioMovimentacao(unidadeRelacional));
         assertThrows(IllegalArgumentException.class, () -> memoria.criarRepositorioRelacionamento(unidadeRelacional));
+        assertThrows(IllegalArgumentException.class, () -> memoria.criarRepositorioCategoria(unidadeRelacional));
         unidadeMemoria.rollback();
+    }
+
+    @Test
+    void R08_categoriaEAssociacaoSaoPersistidasNaUnidadeDeTrabalho() {
+        FabricaPersistenciaMemoria fabrica = new FabricaPersistenciaMemoria();
+        UnidadeDeTrabalhoMemoria gravacao = fabrica.criarUnidadeDeTrabalho();
+        fabrica.criarRepositorioLivro(gravacao).salvar(new Livro("l1", "Livro"));
+        var categorias = fabrica.criarRepositorioCategoria(gravacao);
+        categorias.salvarCategoria("c1", "Ficcao", null);
+        categorias.salvarCategoria("c2", "Fantasia", "c1");
+        categorias.associarLivro("l1", "c2");
+        gravacao.commit();
+
+        UnidadeDeTrabalhoMemoria leitura = fabrica.criarUnidadeDeTrabalho();
+        UnidadeAcervo unidadeAcervo = new UnidadeAcervo("ACERVO", "Acervo");
+        fabrica.criarRepositorioCategoria(leitura).carregar(unidadeAcervo);
+
+        assertEquals(1, unidadeAcervo.buscarGrupo("c1").orElseThrow().contarElementos());
+        assertEquals(java.util.List.of("l1"),
+                unidadeAcervo.buscarGrupo("c1").orElseThrow().listarIdsLivros());
+        leitura.rollback();
     }
 
     @Test

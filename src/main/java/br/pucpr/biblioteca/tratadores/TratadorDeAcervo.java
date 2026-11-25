@@ -9,8 +9,10 @@ import br.pucpr.biblioteca.biblioteca.acervo.composite.UnidadeAcervo;
 import br.pucpr.biblioteca.biblioteca.livro.Livro;
 import br.pucpr.biblioteca.cadastro.CadastroLivro;
 import br.pucpr.biblioteca.comum.excecoes.BibliotecaException;
+import br.pucpr.biblioteca.persistencia.fabrica.RepositorioCategoria;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -20,6 +22,7 @@ public final class TratadorDeAcervo {
     private final CadastroLivro cadastroLivro;
     private final ServicoConsulta consulta;
     private final UnidadeAcervo unidadeAcervo;
+    private final Optional<RepositorioCategoria> repositorioCategoria;
 
     public TratadorDeAcervo(CadastroLivro cadastroLivro, ServicoConsulta consulta) {
         this(cadastroLivro, consulta, new UnidadeAcervo("ACERVO", "Acervo"));
@@ -29,9 +32,27 @@ public final class TratadorDeAcervo {
             CadastroLivro cadastroLivro,
             ServicoConsulta consulta,
             UnidadeAcervo unidadeAcervo) {
+        this(cadastroLivro, consulta, unidadeAcervo, Optional.empty());
+    }
+
+    public TratadorDeAcervo(
+            CadastroLivro cadastroLivro,
+            ServicoConsulta consulta,
+            UnidadeAcervo unidadeAcervo,
+            RepositorioCategoria repositorioCategoria) {
+        this(cadastroLivro, consulta, unidadeAcervo,
+                Optional.of(Objects.requireNonNull(repositorioCategoria)));
+    }
+
+    private TratadorDeAcervo(
+            CadastroLivro cadastroLivro,
+            ServicoConsulta consulta,
+            UnidadeAcervo unidadeAcervo,
+            Optional<RepositorioCategoria> repositorioCategoria) {
         this.cadastroLivro = Objects.requireNonNull(cadastroLivro);
         this.consulta = Objects.requireNonNull(consulta);
         this.unidadeAcervo = Objects.requireNonNull(unidadeAcervo);
+        this.repositorioCategoria = repositorioCategoria;
     }
 
     public String cadastrar(Livro livro) {
@@ -68,6 +89,14 @@ public final class TratadorDeAcervo {
                 : buscarGrupo(idPai);
         SecaoAcervo categoria = new SecaoAcervo(id, nome);
         pai.adicionar(categoria);
+        try {
+            repositorioCategoria.ifPresent(repositorio ->
+                    repositorio.salvarCategoria(id, nome,
+                            idPai == null || idPai.isBlank() ? null : idPai));
+        } catch (RuntimeException excecao) {
+            pai.remover(categoria);
+            throw excecao;
+        }
         return "Categoria criada: " + categoria.id();
     }
 
@@ -76,7 +105,15 @@ public final class TratadorDeAcervo {
             throw new IllegalArgumentException("Livro nao encontrado: " + idLivro);
         }
         GrupoAcervo categoria = buscarGrupo(idCategoria);
-        categoria.adicionar(new ItemAcervo("ITEM-" + UUID.randomUUID(), idLivro));
+        ItemAcervo item = new ItemAcervo("ITEM-" + UUID.randomUUID(), idLivro);
+        categoria.adicionar(item);
+        try {
+            repositorioCategoria.ifPresent(repositorio ->
+                    repositorio.associarLivro(idLivro, idCategoria));
+        } catch (RuntimeException excecao) {
+            categoria.remover(item);
+            throw excecao;
+        }
         return "Livro " + idLivro + " associado a categoria " + categoria.id();
     }
 

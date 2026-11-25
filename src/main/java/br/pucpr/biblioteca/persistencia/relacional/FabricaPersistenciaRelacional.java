@@ -1,6 +1,7 @@
 package br.pucpr.biblioteca.persistencia.relacional;
 
 import br.pucpr.biblioteca.persistencia.fabrica.FabricaPersistencia;
+import br.pucpr.biblioteca.persistencia.fabrica.RepositorioCategoria;
 import br.pucpr.biblioteca.persistencia.fabrica.UnidadeDeTrabalho;
 
 /**
@@ -45,6 +46,12 @@ public final class FabricaPersistenciaRelacional implements FabricaPersistencia 
     @Override
     public RepositorioRelacionamentoRelacional criarRepositorioRelacionamento(UnidadeDeTrabalho unidadeDeTrabalho) {
         return new RepositorioRelacionamentoRelacional(verificar(unidadeDeTrabalho));
+    }
+
+    @Override
+    public RepositorioCategoriaRelacional criarRepositorioCategoria(
+            UnidadeDeTrabalho unidadeDeTrabalho) {
+        return new RepositorioCategoriaRelacional(verificar(unidadeDeTrabalho));
     }
 
     private UnidadeDeTrabalhoRelacional verificar(UnidadeDeTrabalho unidadeDeTrabalho) {

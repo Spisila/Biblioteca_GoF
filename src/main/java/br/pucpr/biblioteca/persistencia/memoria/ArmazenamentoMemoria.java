@@ -10,6 +10,8 @@ public final class ArmazenamentoMemoria {
     private final Map<String, Livro> livros = new HashMap<>();
     private final Map<String, Transacao> transacoes = new HashMap<>();
     private final Map<String, Reserva> reservas = new HashMap<>();
+    private final Map<String, CategoriaPersistida> categorias = new HashMap<>();
+    private final Map<String, String> categoriaPorLivro = new HashMap<>();
 
     synchronized Map<String, Livro> copiarLivros() {
         return copiarLivros(livros);
@@ -23,16 +25,30 @@ public final class ArmazenamentoMemoria {
         return copiarReservas(reservas);
     }
 
+    synchronized Map<String, CategoriaPersistida> copiarCategorias() {
+        return new HashMap<>(categorias);
+    }
+
+    synchronized Map<String, String> copiarCategoriasPorLivro() {
+        return new HashMap<>(categoriaPorLivro);
+    }
+
     synchronized void publicar(
             Map<String, Livro> livros,
             Map<String, Transacao> transacoes,
-            Map<String, Reserva> reservas) {
+            Map<String, Reserva> reservas,
+            Map<String, CategoriaPersistida> categorias,
+            Map<String, String> categoriaPorLivro) {
         this.livros.clear();
         this.livros.putAll(copiarLivros(livros));
         this.transacoes.clear();
         this.transacoes.putAll(copiarTransacoes(transacoes));
         this.reservas.clear();
         this.reservas.putAll(copiarReservas(reservas));
+        this.categorias.clear();
+        this.categorias.putAll(categorias);
+        this.categoriaPorLivro.clear();
+        this.categoriaPorLivro.putAll(categoriaPorLivro);
     }
 
     private static Map<String, Livro> copiarLivros(Map<String, Livro> origem) {
@@ -79,5 +95,8 @@ public final class ArmazenamentoMemoria {
 
     static Reserva copiarReserva(Reserva reserva) {
         return new Reserva(reserva.id(), reserva.idLivro(), reserva.idEstudante(), reserva.dataReserva());
+    }
+
+    record CategoriaPersistida(String id, String nome, String idPai) {
     }
 }

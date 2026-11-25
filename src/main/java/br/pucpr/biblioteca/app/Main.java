@@ -37,10 +37,15 @@ public class Main {
         RelogioSistema relogio = new RelogioSistema();
 
         RepositorioLivroPorOperacao repositorioLivro = new RepositorioLivroPorOperacao(fabrica);
+        UnidadeAcervo unidadeAcervo = new UnidadeAcervo("ACERVO", "Acervo");
+        RepositorioCategoriaPorOperacao repositorioCategoria =
+                new RepositorioCategoriaPorOperacao(fabrica);
+        repositorioCategoria.carregar(unidadeAcervo);
         TratadorDeAcervo tratadorAcervo = new TratadorDeAcervo(
                 new CadastroLivro(repositorioLivro),
                 Configuracao.consulta(new ServicoConsultaOriginal(repositorioLivro)),
-                new UnidadeAcervo("ACERVO", "Acervo"));
+                unidadeAcervo,
+                repositorioCategoria);
 
         RepositorioCadastroMemoria<Pessoa> pessoasMemoria =
                 new RepositorioCadastroMemoria<>(Pessoa.class);

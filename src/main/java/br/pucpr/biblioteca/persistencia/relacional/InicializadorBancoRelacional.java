@@ -37,6 +37,15 @@ final class InicializadorBancoRelacional {
         adicionarRelacionamentoSePossivel(
                 conexao, "atendentes", "fk_atendentes_pessoa",
                 "id", "pessoas", "id");
+        adicionarRelacionamentoSePossivel(
+                conexao, "categorias", "fk_categorias_pai",
+                "id_categoria_pai", "categorias", "id");
+        adicionarRelacionamentoSePossivel(
+                conexao, "livros_categorias", "fk_livros_categorias_livro",
+                "id_livro", "livros", "id", "CASCADE");
+        adicionarRelacionamentoSePossivel(
+                conexao, "livros_categorias", "fk_livros_categorias_categoria",
+                "id_categoria", "categorias", "id");
     }
 
     private static void removerConstraintsAntesDaConversao(
@@ -48,7 +57,8 @@ final class InicializadorBancoRelacional {
                   AND CONSTRAINT_TYPE = 'FOREIGN KEY'
                   AND TABLE_NAME IN (
                       'livros', 'movimentacoes', 'reservas',
-                      'pessoas', 'estudantes', 'atendentes'
+                      'pessoas', 'estudantes', 'atendentes',
+                      'categorias', 'livros_categorias'
                   )
                 """;
         java.util.List<String[]> constraints = new java.util.ArrayList<>();
@@ -137,8 +147,7 @@ final class InicializadorBancoRelacional {
                         situacao VARCHAR(30) NOT NULL,
                         reservado_para VARCHAR(100) NULL,
                         data_devolucao DATE NULL,
-                        PRIMARY KEY (id),
-                        UNIQUE KEY uk_pessoas_cpf (cpf)
+                        PRIMARY KEY (id)
                     ) ENGINE = InnoDB
                       DEFAULT CHARSET = utf8mb4
                       COLLATE = utf8mb4_unicode_ci
@@ -150,7 +159,35 @@ final class InicializadorBancoRelacional {
                         cpf VARCHAR(20) NOT NULL,
                         email VARCHAR(255) NOT NULL,
                         data_nascimento DATE NOT NULL,
-                        PRIMARY KEY (id)
+                        PRIMARY KEY (id),
+                        UNIQUE KEY uk_pessoas_cpf (cpf)
+                    ) ENGINE = InnoDB
+                      DEFAULT CHARSET = utf8mb4
+                      COLLATE = utf8mb4_unicode_ci
+                    """);
+            statement.execute("""
+                    CREATE TABLE IF NOT EXISTS categorias (
+                        id VARCHAR(100) NOT NULL,
+                        nome VARCHAR(255) NOT NULL,
+                        id_categoria_pai VARCHAR(100) NULL,
+                        PRIMARY KEY (id),
+                        CONSTRAINT fk_categorias_pai
+                            FOREIGN KEY (id_categoria_pai) REFERENCES categorias (id)
+                    ) ENGINE = InnoDB
+                      DEFAULT CHARSET = utf8mb4
+                      COLLATE = utf8mb4_unicode_ci
+                    """);
+            statement.execute("""
+                    CREATE TABLE IF NOT EXISTS livros_categorias (
+                        id_livro BIGINT UNSIGNED NOT NULL,
+                        id_categoria VARCHAR(100) NOT NULL,
+                        PRIMARY KEY (id_livro),
+                        INDEX idx_livros_categorias_categoria (id_categoria),
+                        CONSTRAINT fk_livros_categorias_livro
+                            FOREIGN KEY (id_livro) REFERENCES livros (id)
+                            ON DELETE CASCADE,
+                        CONSTRAINT fk_livros_categorias_categoria
+                            FOREIGN KEY (id_categoria) REFERENCES categorias (id)
                     ) ENGINE = InnoDB
                       DEFAULT CHARSET = utf8mb4
                       COLLATE = utf8mb4_unicode_ci
@@ -221,7 +258,9 @@ final class InicializadorBancoRelacional {
             "movimentacoes",
             "reservas",
             "estudantes",
-            "atendentes"
+            "atendentes",
+            "categorias",
+            "livros_categorias"
         };
         try (Statement statement = conexao.createStatement()) {
             for (String tabela : tabelas) {
@@ -257,6 +296,19 @@ final class InicializadorBancoRelacional {
             String coluna,
             String tabelaReferenciada,
             String colunaReferenciada) throws SQLException {
+        adicionarRelacionamentoSePossivel(
+                conexao, tabela, restricao, coluna,
+                tabelaReferenciada, colunaReferenciada, "RESTRICT");
+    }
+
+    private static void adicionarRelacionamentoSePossivel(
+            Connection conexao,
+            String tabela,
+            String restricao,
+            String coluna,
+            String tabelaReferenciada,
+            String colunaReferenciada,
+            String acaoExclusao) throws SQLException {
         if (!tabelaExiste(conexao, tabela)
                 || !tabelaExiste(conexao, tabelaReferenciada)
                 || constraintExiste(conexao, tabela, restricao)) {
@@ -271,9 +323,10 @@ final class InicializadorBancoRelacional {
                     ADD CONSTRAINT %s
                     FOREIGN KEY (%s) REFERENCES %s (%s)
                     ON UPDATE CASCADE
-                    ON DELETE RESTRICT
+                    ON DELETE %s
                     """.formatted(
-                            tabela, restricao, coluna, tabelaReferenciada, colunaReferenciada));
+                            tabela, restricao, coluna,
+                            tabelaReferenciada, colunaReferenciada, acaoExclusao));
         }
     }
 

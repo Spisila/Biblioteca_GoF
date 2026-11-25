@@ -2,6 +2,7 @@ package br.pucpr.biblioteca.persistencia.memoria;
 
 import br.pucpr.biblioteca.persistencia.fabrica.FabricaPersistencia;
 import br.pucpr.biblioteca.persistencia.fabrica.RepositorioLivro;
+import br.pucpr.biblioteca.persistencia.fabrica.RepositorioCategoria;
 import br.pucpr.biblioteca.persistencia.fabrica.RepositorioMovimentacao;
 import br.pucpr.biblioteca.persistencia.fabrica.RepositorioRelacionamento;
 import br.pucpr.biblioteca.persistencia.fabrica.UnidadeDeTrabalho;
@@ -32,6 +33,11 @@ public final class FabricaPersistenciaMemoria implements FabricaPersistencia {
     @Override
     public RepositorioRelacionamento criarRepositorioRelacionamento(UnidadeDeTrabalho unidadeDeTrabalho) {
         return new RepositorioRelacionamentoMemoria(verificar(unidadeDeTrabalho));
+    }
+
+    @Override
+    public RepositorioCategoria criarRepositorioCategoria(UnidadeDeTrabalho unidadeDeTrabalho) {
+        return new RepositorioCategoriaMemoria(verificar(unidadeDeTrabalho));
     }
 
     private UnidadeDeTrabalhoMemoria verificar(UnidadeDeTrabalho unidadeDeTrabalho) {

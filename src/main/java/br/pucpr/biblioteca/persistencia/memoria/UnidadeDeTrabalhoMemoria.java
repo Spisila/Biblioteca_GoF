@@ -16,6 +16,8 @@ public final class UnidadeDeTrabalhoMemoria implements UnidadeDeTrabalho {
     private final Map<String, Livro> livros;
     private final Map<String, Transacao> transacoes;
     private final Map<String, Reserva> reservas;
+    private final Map<String, ArmazenamentoMemoria.CategoriaPersistida> categorias;
+    private final Map<String, String> categoriaPorLivro;
     private boolean encerrada;
 
     public UnidadeDeTrabalhoMemoria(ArmazenamentoMemoria armazenamento) {
@@ -23,12 +25,14 @@ public final class UnidadeDeTrabalhoMemoria implements UnidadeDeTrabalho {
         this.livros = armazenamento.copiarLivros();
         this.transacoes = armazenamento.copiarTransacoes();
         this.reservas = armazenamento.copiarReservas();
+        this.categorias = armazenamento.copiarCategorias();
+        this.categoriaPorLivro = armazenamento.copiarCategoriasPorLivro();
     }
 
     @Override
     public synchronized void commit() {
         verificarAberta();
-        armazenamento.publicar(livros, transacoes, reservas);
+        armazenamento.publicar(livros, transacoes, reservas, categorias, categoriaPorLivro);
         encerrada = true;
     }
 
@@ -64,5 +68,15 @@ public final class UnidadeDeTrabalhoMemoria implements UnidadeDeTrabalho {
     Map<String, Reserva> reservas() {
         verificarAberta();
         return reservas;
+    }
+
+    Map<String, ArmazenamentoMemoria.CategoriaPersistida> categorias() {
+        verificarAberta();
+        return categorias;
+    }
+
+    Map<String, String> categoriaPorLivro() {
+        verificarAberta();
+        return categoriaPorLivro;
     }
 }

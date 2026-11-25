@@ -22,6 +22,27 @@ CREATE TABLE IF NOT EXISTS movimentacoes (
 CREATE INDEX idx_movimentacoes_livro
     ON movimentacoes (id_livro);
 
+CREATE TABLE IF NOT EXISTS categorias (
+    id VARCHAR(100) NOT NULL,
+    nome VARCHAR(255) NOT NULL,
+    id_categoria_pai VARCHAR(100) NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_categorias_pai
+        FOREIGN KEY (id_categoria_pai) REFERENCES categorias (id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS livros_categorias (
+    id_livro BIGINT UNSIGNED NOT NULL,
+    id_categoria VARCHAR(100) NOT NULL,
+    PRIMARY KEY (id_livro),
+    INDEX idx_livros_categorias_categoria (id_categoria),
+    CONSTRAINT fk_livros_categorias_livro
+        FOREIGN KEY (id_livro) REFERENCES livros (id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_livros_categorias_categoria
+        FOREIGN KEY (id_categoria) REFERENCES categorias (id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS reservas (
     id VARCHAR(100) NOT NULL,
     id_livro BIGINT UNSIGNED NOT NULL,

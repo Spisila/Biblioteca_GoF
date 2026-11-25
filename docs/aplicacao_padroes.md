@@ -221,10 +221,12 @@ mantém referências aos grupos-pai para rejeitar ciclos e impedir que um livro
 apareça em mais de um grupo. Mover um item transfere a mesma referência,
 portanto não altera o `Livro` nem seu estado de empréstimo.
 
-Na CLI, `Main` cria uma `UnidadeAcervo` em memória e a injeta em
-`TratadorDeAcervo`. O menu permite criar categorias/subcategorias, associar
-livros existentes e listar ou contar recursivamente os livros de uma categoria.
-Essa organização é mantida apenas durante a execução; não é persistida no banco.
+Na CLI, `Main` carrega as categorias e associações do repositório para uma
+`UnidadeAcervo` e a injeta em `TratadorDeAcervo`. O menu permite criar
+categorias/subcategorias, associar livros existentes e listar ou contar
+recursivamente os livros de uma categoria. O perfil relacional persiste a
+hierarquia em `categorias` e os vínculos em `livros_categorias`; o perfil de
+teste mantém esses dados na implementação transacional em memória.
 
 ## Integração com a aplicação
 

@@ -46,5 +46,6 @@ public final class RepositorioLivroMemoria implements RepositorioLivro {
     @Override
     public void remover(String id) {
         unidadeDeTrabalho.livros().remove(id);
+        unidadeDeTrabalho.categoriaPorLivro().remove(id);
     }
 }

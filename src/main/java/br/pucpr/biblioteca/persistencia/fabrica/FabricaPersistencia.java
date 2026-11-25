@@ -13,4 +13,6 @@ public interface FabricaPersistencia {
     RepositorioMovimentacao criarRepositorioMovimentacao(UnidadeDeTrabalho unidadeDeTrabalho);
 
     RepositorioRelacionamento criarRepositorioRelacionamento(UnidadeDeTrabalho unidadeDeTrabalho);
+
+    RepositorioCategoria criarRepositorioCategoria(UnidadeDeTrabalho unidadeDeTrabalho);
 }

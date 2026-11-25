@@ -110,6 +110,9 @@ Opções administrativas adicionais:
 | Medição de consulta | `biblioteca.consulta.medicao` | `BIBLIOTECA_CONSULTA_MEDICAO` | `true`, `false` |
 
 O esquema básico está disponível em [sql/schema.sql](sql/schema.sql).
+No perfil relacional, categorias e vínculos com livros são armazenados nas
+tabelas `categorias` e `livros_categorias`. A inicialização da aplicação cria
+essas tabelas quando ainda não existem.
 
 ## Como rodar os testes
 
