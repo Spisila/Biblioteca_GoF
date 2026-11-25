@@ -7,6 +7,7 @@ import br.pucpr.biblioteca.academico.estudante.Estudante;
 import br.pucpr.biblioteca.app.RepositorioCadastroMemoria;
 import br.pucpr.biblioteca.biblioteca.acervo.consulta.DecoratorMedicao;
 import br.pucpr.biblioteca.biblioteca.acervo.consulta.ServicoConsultaOriginal;
+import br.pucpr.biblioteca.biblioteca.acervo.composite.UnidadeAcervo;
 import br.pucpr.biblioteca.cadastro.CadastroAtendente;
 import br.pucpr.biblioteca.cadastro.CadastroEstudante;
 import br.pucpr.biblioteca.cadastro.CadastroLivro;
@@ -81,9 +82,11 @@ class ConsoleBibliotecaTest {
                 publicador);
         DecoratorMedicao medicao = new DecoratorMedicao(
                 new ServicoConsultaOriginal(repositorioLivro));
+        UnidadeAcervo unidadeAcervo = new UnidadeAcervo("ACERVO", "Acervo");
         TratadorDeAcervo tratadorAcervo = new TratadorDeAcervo(
                 new CadastroLivro(repositorioLivro),
-                medicao);
+                medicao,
+                unidadeAcervo);
         tratadorAcervo.cadastrar("L-CONSULTA", "Livro para consulta");
         String livroReservado = tratadorAcervo.cadastrar("Livro reservado para listagem")
                 .substring("Livro cadastrado: ".length());
@@ -98,7 +101,11 @@ class ConsoleBibliotecaTest {
                 new TratadorDeEmprestimo(fachada, new ExecutorComando()),
                 new TratadorDeDevolucao(fachada),
                 new TratadorDeMulta(emissor),
-                new Scanner("5\nP-CONSULTA\n6\nE-CONSULTA\n7\nA-CONSULTA\n"
+                new Scanner("20\nCAT-FIC\n\nFiccao\n"
+                        + "20\nCAT-FANT\nCAT-FIC\nFantasia\n"
+                        + "21\nL-CONSULTA\nCAT-FANT\n"
+                        + "22\nCAT-FIC\n23\nCAT-FIC\n24\n"
+                        + "5\nP-CONSULTA\n6\nE-CONSULTA\n7\nA-CONSULTA\n"
                         + "8\nL-CONSULTA\nD\n14\n15\n16\n17\n18\n19\n0\n"),
                 0);
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -142,7 +149,11 @@ class ConsoleBibliotecaTest {
         assertTrue(saida.contains("Livro reservado para listagem"));
         assertTrue(saida.contains("ID do estudante"));
         assertTrue(saida.contains("T-DEMO-"));
-        assertEquals(2, medicao.quantidadeConsultas());
+        assertTrue(saida.contains("Quantidade de livros: 1"));
+        assertTrue(saida.contains("CAT-FIC - Ficcao"));
+        assertTrue(saida.contains("CAT-FANT - Fantasia"));
+        assertEquals(1, unidadeAcervo.contarElementos());
+        assertEquals(4, medicao.quantidadeConsultas());
         assertTrue(!ouvinteMulta.multas().isEmpty());
     }
 

@@ -1,6 +1,7 @@
 package br.pucpr.biblioteca.app;
 
 import br.pucpr.biblioteca.biblioteca.acervo.consulta.ServicoConsultaOriginal;
+import br.pucpr.biblioteca.biblioteca.acervo.composite.UnidadeAcervo;
 import br.pucpr.biblioteca.academico.estudante.Estudante;
 import br.pucpr.biblioteca.cadastro.CadastroAtendente;
 import br.pucpr.biblioteca.cadastro.CadastroEstudante;
@@ -38,7 +39,8 @@ public class Main {
         RepositorioLivroPorOperacao repositorioLivro = new RepositorioLivroPorOperacao(fabrica);
         TratadorDeAcervo tratadorAcervo = new TratadorDeAcervo(
                 new CadastroLivro(repositorioLivro),
-                Configuracao.consulta(new ServicoConsultaOriginal(repositorioLivro)));
+                Configuracao.consulta(new ServicoConsultaOriginal(repositorioLivro)),
+                new UnidadeAcervo("ACERVO", "Acervo"));
 
         RepositorioCadastroMemoria<Pessoa> pessoasMemoria =
                 new RepositorioCadastroMemoria<>(Pessoa.class);

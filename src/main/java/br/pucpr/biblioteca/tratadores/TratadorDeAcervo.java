@@ -2,11 +2,16 @@ package br.pucpr.biblioteca.tratadores;
 
 import br.pucpr.biblioteca.biblioteca.acervo.consulta.MetadadosLivro;
 import br.pucpr.biblioteca.biblioteca.acervo.consulta.ServicoConsulta;
+import br.pucpr.biblioteca.biblioteca.acervo.composite.GrupoAcervo;
+import br.pucpr.biblioteca.biblioteca.acervo.composite.ItemAcervo;
+import br.pucpr.biblioteca.biblioteca.acervo.composite.SecaoAcervo;
+import br.pucpr.biblioteca.biblioteca.acervo.composite.UnidadeAcervo;
 import br.pucpr.biblioteca.biblioteca.livro.Livro;
 import br.pucpr.biblioteca.cadastro.CadastroLivro;
 import br.pucpr.biblioteca.comum.excecoes.BibliotecaException;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Traduz entradas da interface para cadastro e consulta do acervo.
@@ -14,10 +19,19 @@ import java.util.Objects;
 public final class TratadorDeAcervo {
     private final CadastroLivro cadastroLivro;
     private final ServicoConsulta consulta;
+    private final UnidadeAcervo unidadeAcervo;
 
     public TratadorDeAcervo(CadastroLivro cadastroLivro, ServicoConsulta consulta) {
+        this(cadastroLivro, consulta, new UnidadeAcervo("ACERVO", "Acervo"));
+    }
+
+    public TratadorDeAcervo(
+            CadastroLivro cadastroLivro,
+            ServicoConsulta consulta,
+            UnidadeAcervo unidadeAcervo) {
         this.cadastroLivro = Objects.requireNonNull(cadastroLivro);
         this.consulta = Objects.requireNonNull(consulta);
+        this.unidadeAcervo = Objects.requireNonNull(unidadeAcervo);
     }
 
     public String cadastrar(Livro livro) {
@@ -43,6 +57,46 @@ public final class TratadorDeAcervo {
 
     public List<Livro> listarLivros() {
         return cadastroLivro.listar();
+    }
+
+    public String criarCategoria(String id, String idPai, String nome) {
+        if (unidadeAcervo.buscarGrupo(id).isPresent()) {
+            throw new IllegalArgumentException("Ja existe uma categoria com o id: " + id);
+        }
+        GrupoAcervo pai = idPai == null || idPai.isBlank()
+                ? unidadeAcervo
+                : buscarGrupo(idPai);
+        SecaoAcervo categoria = new SecaoAcervo(id, nome);
+        pai.adicionar(categoria);
+        return "Categoria criada: " + categoria.id();
+    }
+
+    public String associarLivro(String idLivro, String idCategoria) {
+        if (!consulta.consultarPorId(idLivro).isPresent()) {
+            throw new IllegalArgumentException("Livro nao encontrado: " + idLivro);
+        }
+        GrupoAcervo categoria = buscarGrupo(idCategoria);
+        categoria.adicionar(new ItemAcervo("ITEM-" + UUID.randomUUID(), idLivro));
+        return "Livro " + idLivro + " associado a categoria " + categoria.id();
+    }
+
+    public List<MetadadosLivro> listarLivrosDaCategoria(String idCategoria) {
+        GrupoAcervo categoria = buscarGrupo(idCategoria);
+        return categoria.listarIdsLivros().stream()
+                .map(idLivro -> consulta.consultarPorId(idLivro)
+                        .orElseThrow(() -> new IllegalStateException(
+                                "Livro associado a categoria nao encontrado: " + idLivro)))
+                .toList();
+    }
+
+    public int contarLivrosDaCategoria(String idCategoria) {
+        return buscarGrupo(idCategoria).contarElementos();
+    }
+
+    public String listarCategoriasComoTexto() {
+        StringBuilder resultado = new StringBuilder();
+        adicionarCategoriaComoTexto(unidadeAcervo, 0, resultado);
+        return resultado.toString();
     }
 
     public String listarComoTexto() {
@@ -73,5 +127,27 @@ public final class TratadorDeAcervo {
 
     private String texto(Object valor) {
         return valor == null ? "-" : valor.toString();
+    }
+
+    private GrupoAcervo buscarGrupo(String idCategoria) {
+        return unidadeAcervo.buscarGrupo(idCategoria)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Categoria nao encontrada: " + idCategoria));
+    }
+
+    private void adicionarCategoriaComoTexto(
+            GrupoAcervo grupo,
+            int nivel,
+            StringBuilder resultado) {
+        for (int indice = 0; indice < nivel; indice++) {
+            resultado.append("  ");
+        }
+        resultado.append(grupo.id()).append(" - ").append(grupo.nome())
+                .append(System.lineSeparator());
+        for (var elemento : grupo.elementos()) {
+            if (elemento instanceof GrupoAcervo) {
+                adicionarCategoriaComoTexto((GrupoAcervo) elemento, nivel + 1, resultado);
+            }
+        }
     }
 }

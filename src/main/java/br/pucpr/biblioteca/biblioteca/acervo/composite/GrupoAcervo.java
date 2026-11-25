@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Composite para unidades, seções e subseções do acervo.
@@ -32,6 +33,24 @@ public class GrupoAcervo implements ElementoAcervo {
 
     public List<ElementoAcervo> elementos() {
         return Collections.unmodifiableList(elementos);
+    }
+
+    public Optional<GrupoAcervo> buscarGrupo(String idGrupo) {
+        if (idGrupo == null || idGrupo.isBlank()) {
+            return Optional.empty();
+        }
+        if (id.equals(idGrupo)) {
+            return Optional.of(this);
+        }
+        for (ElementoAcervo elemento : elementos) {
+            if (elemento instanceof GrupoAcervo) {
+                Optional<GrupoAcervo> grupo = ((GrupoAcervo) elemento).buscarGrupo(idGrupo);
+                if (grupo.isPresent()) {
+                    return grupo;
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     public void adicionar(ElementoAcervo elemento) {

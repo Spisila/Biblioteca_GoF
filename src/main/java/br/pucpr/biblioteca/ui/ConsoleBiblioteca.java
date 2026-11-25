@@ -155,6 +155,21 @@ public final class ConsoleBiblioteca {
             case "19":
                 listarMovimentacoes();
                 break;
+            case "20":
+                criarCategoria();
+                break;
+            case "21":
+                associarLivroCategoria();
+                break;
+            case "22":
+                listarLivrosCategoria();
+                break;
+            case "23":
+                contarLivrosCategoria();
+                break;
+            case "24":
+                listarCategorias();
+                break;
             case "d":
                 demonstrarFluxo();
                 break;
@@ -261,6 +276,48 @@ public final class ConsoleBiblioteca {
                 List.of("ID", "Titulo", "Situacao", "Reservado para", "Data de devolucao"),
                 linhas,
                 "Nenhum livro cadastrado.");
+    }
+
+    private void criarCategoria() {
+        cabecalho("Criar categoria", "Informe uma categoria pai para criar uma subcategoria "
+                + "ou deixe em branco para criar na raiz.");
+        String id = lerObrigatorio("Id da nova categoria: ");
+        String idPai = lerOpcional("Id da categoria pai (vazio para a raiz): ");
+        String nome = lerObrigatorio("Nome da categoria: ");
+        imprimirResultado(acervo.criarCategoria(id, idPai, nome), "Categoria");
+    }
+
+    private void associarLivroCategoria() {
+        cabecalho("Associar livro a categoria",
+                "Cada livro pode pertencer a uma categoria no acervo.");
+        String idLivro = lerObrigatorio("Id do livro: ");
+        String idCategoria = lerObrigatorio("Id da categoria: ");
+        imprimirResultado(acervo.associarLivro(idLivro, idCategoria), "Associacao");
+    }
+
+    private void listarLivrosCategoria() {
+        cabecalho("Livros da categoria", "A listagem inclui as subcategorias.");
+        String idCategoria = lerObrigatorio("Id da categoria: ");
+        List<List<String>> linhas = new ArrayList<>();
+        for (MetadadosLivro livro : acervo.listarLivrosDaCategoria(idCategoria)) {
+            linhas.add(List.of(livro.id(), livro.titulo(), livro.situacao().toString()));
+        }
+        imprimirTabela(
+                List.of("ID", "Titulo", "Situacao"),
+                linhas,
+                "Nenhum livro associado a esta categoria.");
+    }
+
+    private void contarLivrosCategoria() {
+        cabecalho("Contagem da categoria", "A contagem inclui as subcategorias.");
+        String idCategoria = lerObrigatorio("Id da categoria: ");
+        imprimirSucesso("Quantidade de livros: "
+                + acervo.contarLivrosDaCategoria(idCategoria));
+    }
+
+    private void listarCategorias() {
+        cabecalho("Categorias do acervo", "Categorias e subcategorias disponiveis.");
+        System.out.print(acervo.listarCategoriasComoTexto());
     }
 
     private void listarPessoas() {
@@ -601,6 +658,14 @@ public final class ConsoleBiblioteca {
         }
     }
 
+    private String lerOpcional(String mensagem) {
+        System.out.print("  " + mensagem);
+        if (!entrada.hasNextLine()) {
+            throw new IllegalStateException("A entrada foi encerrada.");
+        }
+        return entrada.nextLine().trim();
+    }
+
     private LocalDate lerData(String mensagem) {
         while (true) {
             String valor = lerObrigatorio(mensagem);
@@ -670,6 +735,14 @@ public final class ConsoleBiblioteca {
         System.out.println("| 17 | Atendentes                                          |");
         System.out.println("| 18 | Reservas                                            |");
         System.out.println("| 19 | Movimentacoes                                       |");
+        System.out.println("|----------------------------------------------------------|");
+        System.out.println("| CATEGORIAS                                               |");
+        System.out.println("|----------------------------------------------------------|");
+        System.out.println("| 20 | Criar categoria ou subcategoria                     |");
+        System.out.println("| 21 | Associar livro a categoria                           |");
+        System.out.println("| 22 | Listar livros da categoria                           |");
+        System.out.println("| 23 | Contar livros da categoria                           |");
+        System.out.println("| 24 | Listar categorias                                    |");
         System.out.println("| D  | Demonstracao guiada                                 |");
         System.out.println("| 0  | Sair                                                |");
         System.out.println("+----------------------------------------------------------|");

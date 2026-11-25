@@ -221,6 +221,11 @@ mantém referências aos grupos-pai para rejeitar ciclos e impedir que um livro
 apareça em mais de um grupo. Mover um item transfere a mesma referência,
 portanto não altera o `Livro` nem seu estado de empréstimo.
 
+Na CLI, `Main` cria uma `UnidadeAcervo` em memória e a injeta em
+`TratadorDeAcervo`. O menu permite criar categorias/subcategorias, associar
+livros existentes e listar ou contar recursivamente os livros de uma categoria.
+Essa organização é mantida apenas durante a execução; não é persistida no banco.
+
 ## Integração com a aplicação
 
 `app.Main` monta as dependências e seleciona o perfil de execução. A
