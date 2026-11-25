@@ -3,6 +3,7 @@ package br.pucpr.biblioteca.persistencia.memoria;
 import br.pucpr.biblioteca.biblioteca.movimentacao.Transacao;
 import br.pucpr.biblioteca.persistencia.fabrica.RepositorioMovimentacao;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +30,17 @@ public final class RepositorioMovimentacaoMemoria implements RepositorioMoviment
     public Optional<Transacao> buscarPorId(String id) {
         return Optional.ofNullable(unidadeDeTrabalho.transacoes().get(id))
                 .map(ArmazenamentoMemoria::copiarTransacao);
+    }
+
+    @Override
+    public List<Transacao> listar() {
+        List<Transacao> copia = new ArrayList<>();
+        unidadeDeTrabalho.transacoes().values().stream()
+                .map(ArmazenamentoMemoria::copiarTransacao)
+                .forEach(copia::add);
+        copia.sort(Comparator.comparing(Transacao::dataTransacao)
+                .thenComparing(Transacao::idTransacao));
+        return copia;
     }
 
     @Override

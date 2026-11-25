@@ -1,6 +1,7 @@
 package br.pucpr.biblioteca.persistencia.fabrica;
 
 import br.pucpr.biblioteca.biblioteca.relacionamento.Reserva;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -10,6 +11,8 @@ import java.util.Optional;
  */
 public interface RepositorioRelacionamento {
     void salvarReserva(Reserva reserva);
+
+    List<Reserva> listarReservas();
 
     Optional<Reserva> buscarReservaAtiva(String idLivro);
 

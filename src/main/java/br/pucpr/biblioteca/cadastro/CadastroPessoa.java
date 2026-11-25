@@ -1,5 +1,6 @@
 package br.pucpr.biblioteca.cadastro;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -18,6 +19,10 @@ public final class CadastroPessoa<T extends RegistroCadastravel> extends Templat
 
     public Optional<T> consultarPorId(String id) {
         return repositorio.buscarPorId(id);
+    }
+
+    public List<T> listar() {
+        return repositorio.listar();
     }
 
     @Override

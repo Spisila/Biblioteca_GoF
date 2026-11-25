@@ -121,6 +121,11 @@ class R07_TemplateCadastroTest {
         }
 
         @Override
+        public List<RegistroTeste> listar() {
+            return List.copyOf(dados.values());
+        }
+
+        @Override
         public RegistroTeste salvar(RegistroTeste registro) {
             quantidadeGravacoes++;
             dados.put(registro.id(), registro);

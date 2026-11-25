@@ -2,6 +2,7 @@ package br.pucpr.biblioteca.circulacao.facade;
 
 import br.pucpr.biblioteca.biblioteca.livro.Livro;
 import br.pucpr.biblioteca.biblioteca.movimentacao.Emprestimo;
+import br.pucpr.biblioteca.biblioteca.movimentacao.Transacao;
 import br.pucpr.biblioteca.biblioteca.relacionamento.Reserva;
 import br.pucpr.biblioteca.comum.excecoes.NaoEncontradoException;
 import br.pucpr.biblioteca.comum.relogio.Relogio;
@@ -13,6 +14,7 @@ import br.pucpr.biblioteca.persistencia.fabrica.RepositorioMovimentacao;
 import br.pucpr.biblioteca.persistencia.fabrica.RepositorioRelacionamento;
 import br.pucpr.biblioteca.persistencia.fabrica.UnidadeDeTrabalho;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -144,6 +146,14 @@ public final class FachadaCirculacao {
         return registrarDevolucao(idLivro, idTransacao, relogio.hoje());
     }
 
+    public List<Transacao> listarMovimentacoes() {
+        return emLeitura(repositorios -> repositorios.movimentacoes().listar());
+    }
+
+    public List<Reserva> listarReservas() {
+        return emLeitura(repositorios -> repositorios.relacionamentos().listarReservas());
+    }
+
     private <T> T emTransacao(
             Function<Repositorios, T> operacao) {
         UnidadeDeTrabalho unidade = fabricaPersistencia.criarUnidadeDeTrabalho();
@@ -154,6 +164,24 @@ public final class FachadaCirculacao {
         try {
             T resultado = operacao.apply(repositorios);
             unidade.commit();
+            return resultado;
+        } catch (RuntimeException excecao) {
+            unidade.rollback();
+            throw excecao;
+        } finally {
+            unidade.close();
+        }
+    }
+
+    private <T> T emLeitura(Function<Repositorios, T> consulta) {
+        UnidadeDeTrabalho unidade = fabricaPersistencia.criarUnidadeDeTrabalho();
+        Repositorios repositorios = new Repositorios(
+                fabricaPersistencia.criarRepositorioLivro(unidade),
+                fabricaPersistencia.criarRepositorioMovimentacao(unidade),
+                fabricaPersistencia.criarRepositorioRelacionamento(unidade));
+        try {
+            T resultado = consulta.apply(repositorios);
+            unidade.rollback();
             return resultado;
         } catch (RuntimeException excecao) {
             unidade.rollback();

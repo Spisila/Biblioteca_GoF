@@ -1,5 +1,6 @@
 package br.pucpr.biblioteca.cadastro;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -7,6 +8,8 @@ import java.util.Optional;
  */
 public interface RepositorioCadastro<T> {
     Optional<T> buscarPorId(String id);
+
+    List<T> listar();
 
     default Optional<T> buscarPorCpf(String cpf) {
         return Optional.empty();

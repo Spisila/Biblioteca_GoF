@@ -3,6 +3,7 @@ package br.pucpr.biblioteca.cadastro;
 import br.pucpr.biblioteca.comum.excecoes.PreRequisitoNaoAtendidoException;
 import br.pucpr.biblioteca.rh.pessoa.Pessoa;
 import br.pucpr.biblioteca.academico.estudante.Estudante;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -37,6 +38,10 @@ public final class CadastroEstudante<T extends RegistroCadastravel> extends Temp
 
     public Optional<T> consultarPorId(String id) {
         return repositorio.buscarPorId(id);
+    }
+
+    public List<T> listar() {
+        return repositorio.listar();
     }
 
     @Override

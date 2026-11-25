@@ -1,6 +1,10 @@
 package br.pucpr.biblioteca.ui;
 
 import br.pucpr.biblioteca.academico.estudante.Estudante;
+import br.pucpr.biblioteca.biblioteca.livro.Livro;
+import br.pucpr.biblioteca.biblioteca.movimentacao.Emprestimo;
+import br.pucpr.biblioteca.biblioteca.movimentacao.Transacao;
+import br.pucpr.biblioteca.biblioteca.relacionamento.Reserva;
 import br.pucpr.biblioteca.rh.atendente.Atendente;
 import br.pucpr.biblioteca.rh.pessoa.Pessoa;
 import br.pucpr.biblioteca.tratadores.TratadorDeAcervo;
@@ -13,6 +17,8 @@ import br.pucpr.biblioteca.tratadores.TratadorDePessoa;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
@@ -134,6 +140,21 @@ public final class ConsoleBiblioteca {
             case "14":
                 listarAcervo();
                 break;
+            case "15":
+                listarPessoas();
+                break;
+            case "16":
+                listarEstudantes();
+                break;
+            case "17":
+                listarAtendentes();
+                break;
+            case "18":
+                listarReservas();
+                break;
+            case "19":
+                listarMovimentacoes();
+                break;
             case "d":
                 demonstrarFluxo();
                 break;
@@ -226,9 +247,125 @@ public final class ConsoleBiblioteca {
     }
 
     private void listarAcervo() {
-        cabecalho("Catalogo do acervo", "Lista os livros e seus estados atuais.");
-        System.out.println("  " + acervo.listarComoTexto().replace(
-                System.lineSeparator(), System.lineSeparator() + "  "));
+        cabecalho("Catalogo do acervo", "Lista todos os dados registrados para cada livro.");
+        List<List<String>> linhas = new ArrayList<>();
+        for (Livro livro : acervo.listarLivros()) {
+            linhas.add(List.of(
+                    livro.id(),
+                    livro.titulo(),
+                    livro.situacao().toString(),
+                    texto(livro.reservadoPara()),
+                    texto(livro.dataDevolucao())));
+        }
+        imprimirTabela(
+                List.of("ID", "Titulo", "Situacao", "Reservado para", "Data de devolucao"),
+                linhas,
+                "Nenhum livro cadastrado.");
+    }
+
+    private void listarPessoas() {
+        cabecalho("Pessoas cadastradas", "Lista os dados pessoais registrados.");
+        List<List<String>> linhas = new ArrayList<>();
+        for (Pessoa registro : pessoa.listar()) {
+            linhas.add(List.of(
+                    registro.id(),
+                    registro.nome(),
+                    registro.cpf(),
+                    registro.email(),
+                    registro.dataNascimento().toString()));
+        }
+        imprimirTabela(
+                List.of("ID", "Nome", "CPF", "E-mail", "Nascimento"),
+                linhas,
+                "Nenhuma pessoa cadastrada.");
+    }
+
+    private void listarEstudantes() {
+        cabecalho("Estudantes cadastrados", "Lista os dados pessoais e academicos.");
+        List<List<String>> linhas = new ArrayList<>();
+        for (Estudante registro : estudante.listar()) {
+            linhas.add(List.of(
+                    registro.id(),
+                    registro.nome(),
+                    registro.cpf(),
+                    registro.email(),
+                    registro.dataNascimento().toString(),
+                    registro.numeroMatricula(),
+                    registro.curso(),
+                    Integer.toString(registro.limiteEmprestimos())));
+        }
+        imprimirTabela(
+                List.of("ID", "Nome", "CPF", "E-mail", "Nascimento",
+                        "Matricula", "Curso", "Limite"),
+                linhas,
+                "Nenhum estudante cadastrado.");
+    }
+
+    private void listarAtendentes() {
+        cabecalho("Atendentes cadastrados", "Lista os dados pessoais e funcionais.");
+        List<List<String>> linhas = new ArrayList<>();
+        for (Atendente registro : atendente.listar()) {
+            linhas.add(List.of(
+                    registro.id(),
+                    registro.nome(),
+                    registro.cpf(),
+                    registro.email(),
+                    registro.dataNascimento().toString(),
+                    registro.turno(),
+                    registro.registroFuncional()));
+        }
+        imprimirTabela(
+                List.of("ID", "Nome", "CPF", "E-mail", "Nascimento",
+                        "Turno", "Registro funcional"),
+                linhas,
+                "Nenhum atendente cadastrado.");
+    }
+
+    private void listarReservas() {
+        cabecalho("Reservas ativas", "Lista as reservas ainda registradas no sistema.");
+        List<List<String>> linhas = new ArrayList<>();
+        for (Reserva reserva : emprestimo.listarReservas()) {
+            linhas.add(List.of(
+                    reserva.id(),
+                    reserva.idLivro(),
+                    reserva.idEstudante(),
+                    reserva.dataReserva().toString()));
+        }
+        imprimirTabela(
+                List.of("ID", "ID do livro", "ID do estudante", "Data da reserva"),
+                linhas,
+                "Nenhuma reserva ativa.");
+    }
+
+    private void listarMovimentacoes() {
+        cabecalho("Movimentacoes", "Lista todos os emprestimos registrados.");
+        List<List<String>> linhas = new ArrayList<>();
+        for (Transacao transacao : emprestimo.listarMovimentacoes()) {
+            if (transacao instanceof Emprestimo registro) {
+                linhas.add(List.of(
+                        registro.idTransacao(),
+                        "Emprestimo",
+                        registro.idLivro(),
+                        registro.idEstudante(),
+                        registro.dataTransacao().toString(),
+                        registro.dataVencimento().toString(),
+                        Integer.toString(registro.numRenovacoes())));
+            } else {
+                linhas.add(List.of(
+                        transacao.idTransacao(),
+                        transacao.getClass().getSimpleName(),
+                        "-",
+                        "-",
+                        transacao.dataTransacao().toString(),
+                        "-",
+                        "-"));
+            }
+        }
+        imprimirTabela(
+                List.of("ID", "Tipo", "ID do livro", "ID do estudante",
+                        "Data", "Vencimento", "Renovacoes"),
+                linhas,
+                "Nenhuma movimentacao cadastrada.");
     }
 
     private void reservar() {
@@ -502,23 +639,90 @@ public final class ConsoleBiblioteca {
 
     private void imprimirMenu() {
         System.out.println();
-        System.out.println("+------------------------ MENU PRINCIPAL ---------------------+");
-        System.out.println("| CADASTROS                                                    |");
-        System.out.println("|  1  Cadastrar pessoa                                         |");
-        System.out.println("|  2  Cadastrar estudante (requer Pessoa/CPF existente)        |");
-        System.out.println("|  3  Cadastrar atendente (requer Pessoa/CPF existente)        |");
-        System.out.println("|  4  Cadastrar livro                                          |");
-        System.out.println("| CONSULTAS                                                    |");
-        System.out.println("|  5  Consultar pessoa       6  Consultar estudante            |");
-        System.out.println("|  7  Consultar atendente    8  Consultar livro                |");
-        System.out.println("| 14  Listar catalogo do acervo                                |");
-        System.out.println("| CIRCULACAO                                                   |");
-        System.out.println("|  9  Solicitar reserva      10 Efetivar emprestimo            |");
-        System.out.println("| 11  Renovar emprestimo     12 Registrar devolucao            |");
-        System.out.println("| 13  Emitir multa                                             |");
-        System.out.println("|  D  Demonstracao guiada     0  Sair                          |");
-        System.out.println("+--------------------------------------------------------------+");
+        System.out.println("+--------------------- MENU PRINCIPAL ---------------------+");
+        System.out.println("| CADASTROS                                                |");
+        System.out.println("|----------------------------------------------------------|");
+        System.out.println("| 1  | Cadastrar pessoa                                    |");
+        System.out.println("| 2  | Cadastrar estudante                                 |");
+        System.out.println("| 3  | Cadastrar atendente                                 |");
+        System.out.println("| 4  | Cadastrar livro                                     |");
+        System.out.println("|----------------------------------------------------------|");
+        System.out.println("| CONSULTAS                                                |");
+        System.out.println("|----------------------------------------------------------|");
+        System.out.println("| 5  | Consultar pessoa                                    |");
+        System.out.println("| 6  | Consultar estudante                                 |");
+        System.out.println("| 7  | Consultar atendente                                 |");
+        System.out.println("| 8  | Consultar livro                                     |");
+        System.out.println("|----------------------------------------------------------|");
+        System.out.println("| CIRCULACAO                                               |");
+        System.out.println("|----------------------------------------------------------|");
+        System.out.println("| 9  | Solicitar reserva                                   |");
+        System.out.println("| 10 | Efetivar emprestimo                                 |");
+        System.out.println("| 11 | Renovar emprestimo                                  |");
+        System.out.println("| 12 | Registrar devolucao                                 |");
+        System.out.println("| 13 | Emitir multa                                        |");
+        System.out.println("|----------------------------------------------------------|");
+        System.out.println("| LISTAGENS                                                |");
+        System.out.println("|----------------------------------------------------------|");
+        System.out.println("| 14 | Acervo                                              |");
+        System.out.println("| 15 | Pessoas                                             |");
+        System.out.println("| 16 | Estudantes                                          |");
+        System.out.println("| 17 | Atendentes                                          |");
+        System.out.println("| 18 | Reservas                                            |");
+        System.out.println("| 19 | Movimentacoes                                       |");
+        System.out.println("| D  | Demonstracao guiada                                 |");
+        System.out.println("| 0  | Sair                                                |");
+        System.out.println("+----------------------------------------------------------|");
         System.out.print("Opcao: ");
+    }
+
+    private void imprimirTabela(
+            List<String> cabecalhos,
+            List<List<String>> linhas,
+            String mensagemVazia) {
+        if (linhas.isEmpty()) {
+            System.out.println("  " + mensagemVazia);
+            return;
+        }
+        List<Integer> larguras = new ArrayList<>();
+        for (int indice = 0; indice < cabecalhos.size(); indice++) {
+            larguras.add(cabecalhos.get(indice).length());
+        }
+        for (List<String> linha : linhas) {
+            for (int indice = 0; indice < linha.size(); indice++) {
+                larguras.set(indice, Math.max(larguras.get(indice), linha.get(indice).length()));
+            }
+        }
+        System.out.println("  " + bordaTabela(larguras));
+        System.out.println("  " + linhaTabela(cabecalhos, larguras));
+        System.out.println("  " + bordaTabela(larguras));
+        for (List<String> linha : linhas) {
+            System.out.println("  " + linhaTabela(linha, larguras));
+        }
+        System.out.println("  " + bordaTabela(larguras));
+    }
+
+    private String bordaTabela(List<Integer> larguras) {
+        StringBuilder borda = new StringBuilder("+");
+        for (int largura : larguras) {
+            borda.append("-".repeat(largura + 2)).append('+');
+        }
+        return borda.toString();
+    }
+
+    private String linhaTabela(List<String> valores, List<Integer> larguras) {
+        StringBuilder linha = new StringBuilder("|");
+        for (int indice = 0; indice < valores.size(); indice++) {
+            String valor = valores.get(indice);
+            linha.append(' ').append(valor)
+                    .append(" ".repeat(larguras.get(indice) - valor.length() + 1))
+                    .append('|');
+        }
+        return linha.toString();
+    }
+
+    private String texto(Object valor) {
+        return valor == null ? "-" : valor.toString();
     }
 
     private void cabecalho(String titulo, String descricao) {

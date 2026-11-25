@@ -4,6 +4,7 @@ import br.pucpr.biblioteca.biblioteca.livro.Livro;
 import br.pucpr.biblioteca.persistencia.fabrica.FabricaPersistencia;
 import br.pucpr.biblioteca.persistencia.fabrica.RepositorioLivro;
 import br.pucpr.biblioteca.persistencia.fabrica.UnidadeDeTrabalho;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -20,6 +21,10 @@ public final class CadastroLivro extends TemplateCadastro<Livro> {
 
     public CadastroLivro(FabricaPersistencia fabrica, UnidadeDeTrabalho unidadeDeTrabalho) {
         this(fabrica.criarRepositorioLivro(unidadeDeTrabalho));
+    }
+
+    public List<Livro> listar() {
+        return repositorio.listar();
     }
 
     @Override

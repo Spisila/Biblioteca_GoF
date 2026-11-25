@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -46,6 +48,22 @@ public final class RepositorioRelacionamentoRelacional implements RepositorioRel
             }
         } catch (SQLException excecao) {
             throw UnidadeDeTrabalhoRelacional.falha("Nao foi possivel salvar a reserva", excecao);
+        }
+    }
+
+    @Override
+    public List<Reserva> listarReservas() {
+        String sql = "SELECT id, id_livro, id_estudante, data_reserva "
+                + "FROM reservas ORDER BY data_reserva, id";
+        List<Reserva> reservas = new ArrayList<>();
+        try (PreparedStatement statement = conexao().prepareStatement(sql);
+                ResultSet resultado = statement.executeQuery()) {
+            while (resultado.next()) {
+                reservas.add(mapear(resultado));
+            }
+            return reservas;
+        } catch (SQLException excecao) {
+            throw UnidadeDeTrabalhoRelacional.falha("Nao foi possivel listar as reservas", excecao);
         }
     }
 

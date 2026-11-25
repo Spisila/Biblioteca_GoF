@@ -71,6 +71,9 @@ class ConsoleBibliotecaTest {
         TratadorDeAcervo tratadorAcervo = new TratadorDeAcervo(
                 new CadastroLivro(repositorioLivro),
                 new ServicoConsultaOriginal(repositorioLivro));
+        String livroReservado = tratadorAcervo.cadastrar("Livro reservado para listagem")
+                .substring("Livro cadastrado: ".length());
+        fachada.solicitarReserva("R-TABELA", livroReservado, "E-TABELA");
         ConsoleBiblioteca console = new ConsoleBiblioteca(
                 tratadorAcervo,
                 new TratadorDePessoa<>(new CadastroPessoa<>(pessoas)),
@@ -81,7 +84,7 @@ class ConsoleBibliotecaTest {
                 new TratadorDeEmprestimo(fachada, new ExecutorComando()),
                 new TratadorDeDevolucao(fachada),
                 new TratadorDeMulta(emissor),
-                new Scanner("D\n0\n"),
+                new Scanner("D\n14\n15\n16\n17\n18\n19\n0\n"),
                 0);
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         PrintStream saidaOriginal = System.out;
@@ -99,6 +102,18 @@ class ConsoleBibliotecaTest {
         }
         assertTrue(saida.contains("DEMONSTRACAO CONCLUIDA"));
         assertTrue(saida.contains("Devolucao registrada"));
+        assertTrue(saida.contains("Reservado para"));
+        assertTrue(saida.contains("Data de devolucao"));
+        assertTrue(saida.contains("Pessoa demonstracao"));
+        assertTrue(saida.contains("MAT-DEMO-"));
+        assertTrue(saida.contains("Pessoa atendente demonstracao"));
+        assertTrue(saida.contains("RF-DEMO-"));
+        assertTrue(saida.contains("Livro demonstracao"));
+        assertTrue(saida.contains("R-TABELA"));
+        assertTrue(saida.contains("E-TABELA"));
+        assertTrue(saida.contains("Livro reservado para listagem"));
+        assertTrue(saida.contains("ID do estudante"));
+        assertTrue(saida.contains("T-DEMO-"));
         assertTrue(!ouvinteMulta.multas().isEmpty());
     }
 

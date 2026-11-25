@@ -41,6 +41,10 @@ public final class TratadorDeAcervo {
         return consulta.listar();
     }
 
+    public List<Livro> listarLivros() {
+        return cadastroLivro.listar();
+    }
+
     public String listarComoTexto() {
         StringBuilder resultado = new StringBuilder();
         for (MetadadosLivro metadados : listar()) {

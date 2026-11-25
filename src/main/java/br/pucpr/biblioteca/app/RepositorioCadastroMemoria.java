@@ -2,6 +2,7 @@ package br.pucpr.biblioteca.app;
 
 import br.pucpr.biblioteca.cadastro.RegistroCadastravel;
 import br.pucpr.biblioteca.cadastro.RepositorioCadastro;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -26,6 +27,13 @@ public final class RepositorioCadastroMemoria<T extends RegistroCadastravel>
     @Override
     public Optional<T> buscarPorId(String id) {
         return Optional.ofNullable(registros.get(id));
+    }
+
+    @Override
+    public List<T> listar() {
+        return registros.values().stream()
+                .sorted((primeiro, segundo) -> primeiro.id().compareTo(segundo.id()))
+                .toList();
     }
 
     @Override

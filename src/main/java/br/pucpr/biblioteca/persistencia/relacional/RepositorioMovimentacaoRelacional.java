@@ -74,6 +74,24 @@ public final class RepositorioMovimentacaoRelacional implements RepositorioMovim
     }
 
     @Override
+    public List<Transacao> listar() {
+        String sql = "SELECT id_transacao, id_livro, id_estudante, data_transacao, "
+                + "data_vencimento, num_renovacoes FROM movimentacoes "
+                + "ORDER BY data_transacao, id_transacao";
+        List<Transacao> movimentacoes = new ArrayList<>();
+        try (PreparedStatement statement = conexao().prepareStatement(sql);
+                ResultSet resultado = statement.executeQuery()) {
+            while (resultado.next()) {
+                movimentacoes.add(mapear(resultado));
+            }
+            return movimentacoes;
+        } catch (SQLException excecao) {
+            throw UnidadeDeTrabalhoRelacional.falha(
+                    "Nao foi possivel listar as movimentacoes", excecao);
+        }
+    }
+
+    @Override
     public List<Transacao> listarPorLivro(String idLivro) {
         String sql = "SELECT id_transacao, id_livro, id_estudante, data_transacao, "
                 + "data_vencimento, num_renovacoes FROM movimentacoes "

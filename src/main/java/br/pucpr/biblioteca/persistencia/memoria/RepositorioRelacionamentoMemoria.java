@@ -2,6 +2,8 @@ package br.pucpr.biblioteca.persistencia.memoria;
 
 import br.pucpr.biblioteca.biblioteca.relacionamento.Reserva;
 import br.pucpr.biblioteca.persistencia.fabrica.RepositorioRelacionamento;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,6 +21,15 @@ public final class RepositorioRelacionamentoMemoria implements RepositorioRelaci
     @Override
     public void salvarReserva(Reserva reserva) {
         unidadeDeTrabalho.reservas().put(reserva.idLivro(), ArmazenamentoMemoria.copiarReserva(reserva));
+    }
+
+    @Override
+    public List<Reserva> listarReservas() {
+        return unidadeDeTrabalho.reservas().values().stream()
+                .map(ArmazenamentoMemoria::copiarReserva)
+                .sorted(Comparator.comparing(Reserva::dataReserva)
+                        .thenComparing(Reserva::id))
+                .toList();
     }
 
     @Override

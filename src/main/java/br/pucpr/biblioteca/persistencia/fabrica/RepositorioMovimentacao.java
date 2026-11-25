@@ -14,5 +14,7 @@ public interface RepositorioMovimentacao {
 
     Optional<Transacao> buscarPorId(String id);
 
+    List<Transacao> listar();
+
     List<Transacao> listarPorLivro(String idLivro);
 }

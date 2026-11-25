@@ -11,6 +11,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public final class RepositorioCadastroRelacional<T extends RegistroCadastravel>
@@ -38,6 +40,20 @@ public final class RepositorioCadastroRelacional<T extends RegistroCadastravel>
         }
         if (tipo == RegistroConsole.class) {
             return buscarRegistroConsole(id).map(tipo::cast);
+        }
+        throw new IllegalArgumentException("Tipo de cadastro nao suportado: " + tipo.getName());
+    }
+
+    @Override
+    public List<T> listar() {
+        if (tipo == Estudante.class) {
+            return listarEstudantes().stream().map(tipo::cast).toList();
+        }
+        if (tipo == Atendente.class) {
+            return listarAtendentes().stream().map(tipo::cast).toList();
+        }
+        if (tipo == Pessoa.class) {
+            return listarPessoas().stream().map(tipo::cast).toList();
         }
         throw new IllegalArgumentException("Tipo de cadastro nao suportado: " + tipo.getName());
     }
@@ -89,6 +105,20 @@ public final class RepositorioCadastroRelacional<T extends RegistroCadastravel>
         }
     }
 
+    private List<Pessoa> listarPessoas() {
+        List<Pessoa> pessoas = new ArrayList<>();
+        try (PreparedStatement statement = unidade.conexao().prepareStatement(
+                "SELECT id, nome, cpf, email, data_nascimento FROM pessoas ORDER BY id");
+                ResultSet resultado = statement.executeQuery()) {
+            while (resultado.next()) {
+                pessoas.add(pessoa(resultado));
+            }
+            return pessoas;
+        } catch (SQLException excecao) {
+            throw UnidadeDeTrabalhoRelacional.falha("Nao foi possivel listar pessoas", excecao);
+        }
+    }
+
     private Optional<Pessoa> buscarPessoaPorCpf(String cpf) {
         try (PreparedStatement statement = unidade.conexao().prepareStatement(
                 "SELECT id, nome, cpf, email, data_nascimento FROM pessoas WHERE cpf = ?")) {
@@ -119,6 +149,22 @@ public final class RepositorioCadastroRelacional<T extends RegistroCadastravel>
             }
         } catch (SQLException excecao) {
             throw UnidadeDeTrabalhoRelacional.falha("Nao foi possivel buscar estudante", excecao);
+        }
+    }
+
+    private List<Estudante> listarEstudantes() {
+        String sql = "SELECT p.id, p.nome, p.cpf, p.email, p.data_nascimento, "
+                + "e.numero_matricula, e.curso, e.limite_emprestimos "
+                + "FROM estudantes e JOIN pessoas p ON p.id = e.id ORDER BY p.id";
+        List<Estudante> estudantes = new ArrayList<>();
+        try (PreparedStatement statement = unidade.conexao().prepareStatement(sql);
+                ResultSet resultado = statement.executeQuery()) {
+            while (resultado.next()) {
+                estudantes.add(estudante(resultado));
+            }
+            return estudantes;
+        } catch (SQLException excecao) {
+            throw UnidadeDeTrabalhoRelacional.falha("Nao foi possivel listar estudantes", excecao);
         }
     }
 
@@ -154,6 +200,22 @@ public final class RepositorioCadastroRelacional<T extends RegistroCadastravel>
             }
         } catch (SQLException excecao) {
             throw UnidadeDeTrabalhoRelacional.falha("Nao foi possivel buscar atendente", excecao);
+        }
+    }
+
+    private List<Atendente> listarAtendentes() {
+        String sql = "SELECT p.id, p.nome, p.cpf, p.email, p.data_nascimento, "
+                + "a.turno, a.registro_funcional "
+                + "FROM atendentes a JOIN pessoas p ON p.id = a.id ORDER BY p.id";
+        List<Atendente> atendentes = new ArrayList<>();
+        try (PreparedStatement statement = unidade.conexao().prepareStatement(sql);
+                ResultSet resultado = statement.executeQuery()) {
+            while (resultado.next()) {
+                atendentes.add(atendente(resultado));
+            }
+            return atendentes;
+        } catch (SQLException excecao) {
+            throw UnidadeDeTrabalhoRelacional.falha("Nao foi possivel listar atendentes", excecao);
         }
     }
 

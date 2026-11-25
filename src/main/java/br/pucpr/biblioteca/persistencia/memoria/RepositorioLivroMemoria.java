@@ -39,6 +39,7 @@ public final class RepositorioLivroMemoria implements RepositorioLivro {
     public List<Livro> listar() {
         List<Livro> copia = new ArrayList<>();
         unidadeDeTrabalho.livros().values().forEach(livro -> copia.add(ArmazenamentoMemoria.copiarLivro(livro)));
+        copia.sort((primeiro, segundo) -> primeiro.id().compareTo(segundo.id()));
         return copia;
     }
 

@@ -6,8 +6,9 @@ import br.pucpr.biblioteca.persistencia.fabrica.FabricaPersistencia;
 import br.pucpr.biblioteca.persistencia.fabrica.UnidadeDeTrabalho;
 import br.pucpr.biblioteca.persistencia.relacional.RepositorioCadastroRelacional;
 import br.pucpr.biblioteca.persistencia.relacional.UnidadeDeTrabalhoRelacional;
-import java.util.Optional;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 final class RepositorioCadastroPorOperacao<T extends RegistroCadastravel>
         implements RepositorioCadastro<T> {
@@ -29,6 +30,21 @@ final class RepositorioCadastroPorOperacao<T extends RegistroCadastravel>
         UnidadeDeTrabalho unidade = fabrica.criarUnidadeDeTrabalho();
         try {
             Optional<T> resultado = repositorio(unidade).buscarPorId(id);
+            unidade.rollback();
+            return resultado;
+        } catch (RuntimeException excecao) {
+            unidade.rollback();
+            throw excecao;
+        } finally {
+            unidade.close();
+        }
+    }
+
+    @Override
+    public List<T> listar() {
+        UnidadeDeTrabalho unidade = fabrica.criarUnidadeDeTrabalho();
+        try {
+            List<T> resultado = repositorio(unidade).listar();
             unidade.rollback();
             return resultado;
         } catch (RuntimeException excecao) {

@@ -1,12 +1,15 @@
 package br.pucpr.biblioteca.tratadores;
 
 import br.pucpr.biblioteca.biblioteca.movimentacao.Emprestimo;
+import br.pucpr.biblioteca.biblioteca.movimentacao.Transacao;
+import br.pucpr.biblioteca.biblioteca.relacionamento.Reserva;
 import br.pucpr.biblioteca.circulacao.facade.FachadaCirculacao;
 import br.pucpr.biblioteca.comum.excecoes.BibliotecaException;
 import br.pucpr.biblioteca.circulacao.comando.ComandoRenovacao;
 import br.pucpr.biblioteca.circulacao.comando.ComandoReserva;
 import br.pucpr.biblioteca.circulacao.comando.ExecutorComando;
 import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -48,6 +51,14 @@ public final class TratadorDeEmprestimo {
         } catch (BibliotecaException | IllegalArgumentException excecao) {
             return "Nao foi possivel realizar o empréstimo: " + excecao.getMessage();
         }
+    }
+
+    public List<Transacao> listarMovimentacoes() {
+        return fachada.listarMovimentacoes();
+    }
+
+    public List<Reserva> listarReservas() {
+        return fachada.listarReservas();
     }
 
     public boolean renovar(String idLivro, String idTransacao) {
