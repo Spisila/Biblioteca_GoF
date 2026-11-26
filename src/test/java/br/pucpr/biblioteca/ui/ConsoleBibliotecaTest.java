@@ -164,7 +164,8 @@ class ConsoleBibliotecaTest {
         assertTrue(saida.contains("CAT-FANT - Fantasia"));
         assertEquals(2, unidadeAcervo.contarElementos());
         assertEquals(12, medicao.quantidadeConsultas());
-        assertTrue(!ouvinteMulta.multas().isEmpty());
+        assertEquals(1, ouvinteMulta.multas().size());
+        assertTrue(saida.contains("Multa emitida: " + ouvinteMulta.multas().get(0).valor()));
     }
 
     private static final class RepositorioLivroDeTeste implements RepositorioLivro {

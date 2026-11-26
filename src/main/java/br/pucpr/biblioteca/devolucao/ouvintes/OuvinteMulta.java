@@ -36,6 +36,7 @@ public final class OuvinteMulta implements OuvinteDevolucao {
         if (evento.diasDeAtraso() > 0) {
             Multa multa = emissor.emitir(Math.toIntExact(evento.diasDeAtraso()));
             multas.add(multa);
+            System.out.println("Multa emitida: " + multa.valor());
             if (servicoCobranca != null) {
                 String idCobranca = "multa-" + evento.idLivro() + "-" + evento.dataDevolucao();
                 cobrancas.add(servicoCobranca.emitir(
