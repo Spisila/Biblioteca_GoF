@@ -699,6 +699,7 @@ public final class ConsoleBiblioteca {
         System.out.println();
         System.out.println("  [" + numero + "/" + total + "] " + titulo);
         System.out.println("      " + descricao);
+        System.out.println();
         pausaDemonstracao();
         String resultado = operacao.executar();
         if (resultado == null || resultado.toLowerCase().contains("nao foi possivel")
@@ -711,6 +712,7 @@ public final class ConsoleBiblioteca {
         int inicioConsulta = resultado.indexOf(marcadorConsulta);
         if (inicioConsulta >= 0) {
             System.out.println("      Resultado: " + resultado.substring(0, inicioConsulta));
+            System.out.println();
             System.out.println("      Consulta imediata:");
             String consulta = resultado.substring(inicioConsulta + marcadorConsulta.length());
             imprimirConsultaFormatada(consulta, "        ");
@@ -864,13 +866,13 @@ public final class ConsoleBiblioteca {
         System.out.println("| CATEGORIAS                                               |");
         System.out.println("|----------------------------------------------------------|");
         System.out.println("| 20 | Criar categoria ou subcategoria                     |");
-        System.out.println("| 21 | Associar livro a categoria                           |");
-        System.out.println("| 22 | Listar livros da categoria                           |");
-        System.out.println("| 23 | Contar livros da categoria                           |");
-        System.out.println("| 24 | Listar categorias                                    |");
+        System.out.println("| 21 | Associar livro a categoria                          |");
+        System.out.println("| 22 | Listar livros da categoria                          |");
+        System.out.println("| 23 | Contar livros da categoria                          |");
+        System.out.println("| 24 | Listar categorias                                   |");
         System.out.println("| D  | Demonstracao guiada                                 |");
         System.out.println("| 0  | Sair                                                |");
-        System.out.println("+----------------------------------------------------------|");
+        System.out.println("+----------------------------------------------------------+");
         System.out.print("Opcao: ");
     }
 

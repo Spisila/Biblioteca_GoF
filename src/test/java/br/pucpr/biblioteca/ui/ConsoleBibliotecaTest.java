@@ -139,6 +139,10 @@ class ConsoleBibliotecaTest {
         for (int etapa = 1; etapa <= 13; etapa++) {
             assertTrue(saida.contains("[" + etapa + "/13]"), "Etapa " + etapa + " nao exibida");
         }
+        assertTrue(saida.contains("  [1/13] Preparando o cadastro base do estudante"
+                + System.lineSeparator()
+                + "      Cadastramos a Pessoa e consultamos o registro pelo identificador retornado."
+                + System.lineSeparator() + System.lineSeparator() + "      Resultado:"));
         assertTrue(saida.contains("DEMONSTRACAO CONCLUIDA"));
         assertTrue(saida.contains("Devolucao registrada"));
         assertTrue(saida.contains("Reservado para"));
