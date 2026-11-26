@@ -121,6 +121,10 @@ class ConsoleBibliotecaTest {
         String saida = bytes.toString(StandardCharsets.UTF_8);
         assertTrue(saida.contains("Nome=Nome Pessoa"));
         assertTrue(saida.contains("CPF=11111111111"));
+        assertTrue(saida.contains("  Resultado:" + System.lineSeparator()
+                + "    Pessoa encontrada:" + System.lineSeparator()
+                + "      ID=P-CONSULTA" + System.lineSeparator()
+                + "      Nome=Nome Pessoa"));
         assertTrue(saida.contains("Data de nascimento=1980-02-03"));
         assertTrue(saida.contains("Matricula=MAT-CONSULTA"));
         assertTrue(saida.contains("Curso=Biblioteconomia"));
@@ -149,8 +153,10 @@ class ConsoleBibliotecaTest {
         assertTrue(saida.contains("Livro reservado para listagem"));
         assertTrue(saida.contains("ID do estudante"));
         assertTrue(saida.contains("T-DEMO-"));
-        assertTrue(saida.contains("Consulta imediata: Pessoa encontrada:"));
-        assertTrue(saida.contains("Consulta imediata: Estudante encontrado:"));
+        assertTrue(saida.contains("Consulta imediata:" + System.lineSeparator()
+                + "        Pessoa encontrada:" + System.lineSeparator() + "          ID="));
+        assertTrue(saida.contains("Consulta imediata:" + System.lineSeparator()
+                + "        Estudante encontrado:" + System.lineSeparator() + "          ID="));
         assertTrue(saida.contains("Consulta recursiva da categoria CAT-DEMO-"));
         assertEquals(13, saida.split("Consulta imediata:", -1).length - 1);
         assertTrue(saida.contains("Quantidade de livros: 1"));

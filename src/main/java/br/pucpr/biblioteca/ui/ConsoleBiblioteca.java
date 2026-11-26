@@ -707,10 +707,19 @@ public final class ConsoleBiblioteca {
             throw new IllegalStateException(
                     resultado == null ? "A operacao nao retornou um resultado." : resultado);
         }
-        String[] linhasResultado = resultado.split("\\R", -1);
-        System.out.println("      Resultado: " + linhasResultado[0]);
-        for (int indice = 1; indice < linhasResultado.length; indice++) {
-            System.out.println("                 " + linhasResultado[indice]);
+        String marcadorConsulta = System.lineSeparator() + "Consulta imediata: ";
+        int inicioConsulta = resultado.indexOf(marcadorConsulta);
+        if (inicioConsulta >= 0) {
+            System.out.println("      Resultado: " + resultado.substring(0, inicioConsulta));
+            System.out.println("      Consulta imediata:");
+            String consulta = resultado.substring(inicioConsulta + marcadorConsulta.length());
+            imprimirConsultaFormatada(consulta, "        ");
+        } else {
+            String[] linhasResultado = resultado.split("\\R", -1);
+            System.out.println("      Resultado: " + linhasResultado[0]);
+            for (int indice = 1; indice < linhasResultado.length; indice++) {
+                System.out.println("                 " + linhasResultado[indice]);
+            }
         }
         pausaDemonstracao();
         return resultado;
@@ -934,7 +943,8 @@ public final class ConsoleBiblioteca {
         if (resultado.toLowerCase().contains("nao encontrado")) {
             imprimirFalha("Consulta sem resultados", resultado);
         } else {
-            System.out.println("  Resultado: " + resultado);
+            System.out.println("  Resultado:");
+            imprimirConsultaFormatada(resultado, "    ");
         }
     }
 
@@ -950,6 +960,22 @@ public final class ConsoleBiblioteca {
     private void imprimirSucesso(String mensagem) {
         System.out.println();
         System.out.println("  [OK] " + mensagem);
+    }
+
+    private void imprimirConsultaFormatada(String consulta, String indentacao) {
+        int inicioCampos = consulta.indexOf(": ");
+        if (inicioCampos < 0) {
+            for (String linha : consulta.split("\\R", -1)) {
+                System.out.println(indentacao + linha);
+            }
+            return;
+        }
+
+        System.out.println(indentacao + consulta.substring(0, inicioCampos + 1));
+        String[] campos = consulta.substring(inicioCampos + 2).split(" \\| ", -1);
+        for (String campo : campos) {
+            System.out.println(indentacao + "  " + campo);
+        }
     }
 
     private void imprimirFalha(String titulo, String detalhe) {
