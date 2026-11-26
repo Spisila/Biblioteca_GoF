@@ -41,11 +41,14 @@ public class Main {
         RepositorioCategoriaPorOperacao repositorioCategoria =
                 new RepositorioCategoriaPorOperacao(fabrica);
         repositorioCategoria.carregar(unidadeAcervo);
+        Configuracao.ConsultaConfigurada consulta = Configuracao.consultaConfigurada(
+                new ServicoConsultaOriginal(repositorioLivro));
         TratadorDeAcervo tratadorAcervo = new TratadorDeAcervo(
                 new CadastroLivro(repositorioLivro),
-                Configuracao.consulta(new ServicoConsultaOriginal(repositorioLivro)),
+                consulta.servico(),
                 unidadeAcervo,
-                repositorioCategoria);
+                repositorioCategoria,
+                consulta.invalidarCache());
 
         RepositorioCadastroMemoria<Pessoa> pessoasMemoria =
                 new RepositorioCadastroMemoria<>(Pessoa.class);
@@ -72,7 +75,8 @@ public class Main {
         EmissorMulta emissorMulta = new EmissorMulta(Configuracao.politicaMulta());
         ServicoCobranca servicoCobranca = new ServicoCobranca(Configuracao.cobranca());
         PublicadorDevolucao publicador = criarPublicador(emissorMulta, servicoCobranca);
-        FachadaCirculacao fachada = new FachadaCirculacao(fabrica, relogio, publicador);
+        FachadaCirculacao fachada = new FachadaCirculacao(
+                fabrica, relogio, publicador, consulta.invalidarCache());
         TratadorDeEmprestimo tratadorEmprestimo = new TratadorDeEmprestimo(
                 fachada, new ExecutorComando());
 

@@ -1,11 +1,12 @@
 package br.pucpr.biblioteca.biblioteca.acervo.consulta;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Mede quantidade e duração das consultas sem alterar seus resultados.
+ * Mede e apresenta a duração das consultas sem alterar seus resultados.
  *
  * <p>Padrão: R09 Decorator — papel: Decorator concreto.</p>
  */
@@ -46,7 +47,12 @@ public final class DecoratorMedicao extends DecoratorConsulta {
     }
 
     private void registrar(long inicio) {
+        long duracaoNanos = System.nanoTime() - inicio;
         quantidadeConsultas.incrementAndGet();
-        totalNanos.addAndGet(System.nanoTime() - inicio);
+        totalNanos.addAndGet(duracaoNanos);
+        System.out.printf(
+                Locale.ROOT,
+                "[MEDIÇÃO] Consulta executada em %.2f ms%n",
+                duracaoNanos / 1_000_000.0);
     }
 }

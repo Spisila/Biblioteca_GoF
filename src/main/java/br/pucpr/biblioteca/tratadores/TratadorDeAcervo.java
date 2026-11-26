@@ -23,6 +23,7 @@ public final class TratadorDeAcervo {
     private final ServicoConsulta consulta;
     private final UnidadeAcervo unidadeAcervo;
     private final Optional<RepositorioCategoria> repositorioCategoria;
+    private final Runnable invalidarCacheConsulta;
 
     public TratadorDeAcervo(CadastroLivro cadastroLivro, ServicoConsulta consulta) {
         this(cadastroLivro, consulta, new UnidadeAcervo("ACERVO", "Acervo"));
@@ -32,7 +33,7 @@ public final class TratadorDeAcervo {
             CadastroLivro cadastroLivro,
             ServicoConsulta consulta,
             UnidadeAcervo unidadeAcervo) {
-        this(cadastroLivro, consulta, unidadeAcervo, Optional.empty());
+        this(cadastroLivro, consulta, unidadeAcervo, Optional.empty(), () -> { });
     }
 
     public TratadorDeAcervo(
@@ -41,27 +42,42 @@ public final class TratadorDeAcervo {
             UnidadeAcervo unidadeAcervo,
             RepositorioCategoria repositorioCategoria) {
         this(cadastroLivro, consulta, unidadeAcervo,
-                Optional.of(Objects.requireNonNull(repositorioCategoria)));
+                Optional.of(Objects.requireNonNull(repositorioCategoria)), () -> { });
+    }
+
+    public TratadorDeAcervo(
+            CadastroLivro cadastroLivro,
+            ServicoConsulta consulta,
+            UnidadeAcervo unidadeAcervo,
+            RepositorioCategoria repositorioCategoria,
+            Runnable invalidarCacheConsulta) {
+        this(cadastroLivro, consulta, unidadeAcervo,
+                Optional.of(Objects.requireNonNull(repositorioCategoria)),
+                invalidarCacheConsulta);
     }
 
     private TratadorDeAcervo(
             CadastroLivro cadastroLivro,
             ServicoConsulta consulta,
             UnidadeAcervo unidadeAcervo,
-            Optional<RepositorioCategoria> repositorioCategoria) {
+            Optional<RepositorioCategoria> repositorioCategoria,
+            Runnable invalidarCacheConsulta) {
         this.cadastroLivro = Objects.requireNonNull(cadastroLivro);
         this.consulta = Objects.requireNonNull(consulta);
         this.unidadeAcervo = Objects.requireNonNull(unidadeAcervo);
         this.repositorioCategoria = repositorioCategoria;
+        this.invalidarCacheConsulta = Objects.requireNonNull(invalidarCacheConsulta);
     }
 
     public String cadastrar(Livro livro) {
+        Livro cadastrado;
         try {
-            Livro cadastrado = cadastroLivro.incluir(livro);
-            return "Livro cadastrado: " + cadastrado.id();
+            cadastrado = cadastroLivro.incluir(livro);
         } catch (BibliotecaException | IllegalArgumentException excecao) {
             return "Nao foi possivel cadastrar o livro: " + excecao.getMessage();
         }
+        invalidarCacheConsulta.run();
+        return "Livro cadastrado: " + cadastrado.id();
     }
 
     public String cadastrar(String id, String titulo) {

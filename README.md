@@ -77,6 +77,12 @@ categorias e subcategorias, associa e lista livros recursivamente, inclui duas
 renovações e uma devolução atrasada, mostrando a notificação dos ouvintes e a
 emissão da multa. A opção `14` lista o catálogo com os estados atuais dos livros.
 
+Para demonstrar o Decorator na CLI, cadastre um livro e use a opção `8`
+("Consultar livro") duas vezes com o mesmo ID. A primeira consulta mostra
+`[CACHE] MISS`; a segunda mostra `[CACHE] HIT`. Ambas exibem a duração medida
+pela camada externa `[MEDIÇÃO]`. O cache expira após 30 segundos e é invalidado
+automaticamente após cadastros e movimentações concluídas na aplicação.
+
 Para usar persistência em memória:
 
 ```powershell
@@ -103,12 +109,17 @@ As credenciais também podem ser fornecidas por propriedades de sistema ou vari�
 
 Opções administrativas adicionais:
 
-| Configuração | Propriedade | Variável | Valores |
+| Configuração | Propriedade | Variável | Valores (padrão) |
 |---|---|---|---|
 | Política de multa | `biblioteca.multa.politica` | `BIBLIOTECA_MULTA_POLITICA` | `original`, `teto`, `tolerancia` |
 | Banco de cobrança | `biblioteca.cobranca.banco` | `BIBLIOTECA_COBRANCA_BANCO` | `A`, `B` |
-| Cache de consulta | `biblioteca.consulta.cache` | `BIBLIOTECA_CONSULTA_CACHE` | `true`, `false` |
-| Medição de consulta | `biblioteca.consulta.medicao` | `BIBLIOTECA_CONSULTA_MEDICAO` | `true`, `false` |
+| Cache de consulta | `biblioteca.consulta.cache` | `BIBLIOTECA_CONSULTA_CACHE` | `true` (true), `false` |
+| Medição de consulta | `biblioteca.consulta.medicao` | `BIBLIOTECA_CONSULTA_MEDICAO` | `true` (true), `false` |
+
+O cache guarda metadados somente em memória, não guarda consultas sem resultado
+nem falhas, e devolve cópias defensivas das listas. Alterações feitas por outra
+instância podem levar até 30 segundos para aparecer; operações críticas de
+empréstimo e reserva continuam validando o estado persistido do domínio.
 
 O esquema básico está disponível em [sql/schema.sql](sql/schema.sql).
 No perfil relacional, categorias e vínculos com livros são armazenados nas

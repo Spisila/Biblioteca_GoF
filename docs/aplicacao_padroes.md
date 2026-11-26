@@ -197,12 +197,27 @@ pré-requisitos são verificados antes da gravação.
 - `ServicoConsulta` é o componente.
 - `ServicoConsultaOriginal` consulta o repositório sem extensões.
 - `DecoratorConsulta` é o decorator abstrato.
-- `DecoratorCache` adiciona cache de `MetadadosLivro`.
-- `DecoratorMedicao` adiciona contagem e medição de duração das consultas.
+- `DecoratorCache` adiciona cache em memória com expiração de 30 segundos,
+  cópias defensivas das listas e invalidação após cadastros e movimentações
+  concluídas. IDs são usados como chaves sem normalização, pois sua semântica é
+  exata. Consultas sem resultado e falhas não são armazenadas.
+- `DecoratorMedicao` adiciona contagem e mostra a duração real da consulta em
+  milissegundos, inclusive quando o serviço encapsulado lança uma exceção.
 
-Os decorators podem ser combinados sem alterar o serviço original. O cache
-guarda somente metadados imutáveis; operações críticas continuam consultando
-o `Livro` real por meio da fachada e das regras de domínio.
+`Configuracao.consultaConfigurada` compõe o serviço na ordem
+`DecoratorMedicao(DecoratorCache(ServicoConsultaOriginal))`. `Main` injeta o
+serviço pela interface `ServicoConsulta` no `TratadorDeAcervo` e compartilha a
+ação de invalidação com o tratador e a fachada de circulação. Cache e medição
+ficam habilitados por padrão e podem ser desabilitados pelas configurações
+descritas no README.
+
+As mensagens `MISS`, `HIT` e `EXPIRED` informam, respectivamente, uma consulta
+sem entrada válida, o reaproveitamento de uma entrada e a renovação de uma
+entrada vencida. O cache armazena visões imutáveis de metadados, nunca participa
+de decisões de empréstimo ou reserva, e é invalidado depois de alterações
+locais confirmadas. Alterações feitas fora desta instância da aplicação podem
+ser refletidas com atraso de até 30 segundos; por isso, as regras de domínio
+continuam usando o estado persistido e não este cache.
 
 ## R10 — Composite
 
@@ -234,10 +249,11 @@ teste mantém esses dados na implementação transacional em memória.
 `ConsoleBiblioteca` acessa os recursos somente pelos tratadores:
 
 1. os tratadores recebem entradas da CLI;
-2. a fachada coordena operações de circulação;
-3. comandos encapsulam solicitações que precisam de idempotência;
-4. eventos de devolução notificam observadores;
-5. a fábrica fornece a família de persistência selecionada.
+2. consultas do acervo passam pela composição Decorator configurada em `Main`;
+3. a fachada coordena operações de circulação e invalida o cache após commits;
+4. comandos encapsulam solicitações que precisam de idempotência;
+5. eventos de devolução notificam observadores;
+6. a fábrica fornece a família de persistência selecionada.
 
 Esse fluxo mantém a interface desacoplada das entidades, repositórios e regras
 internas do domínio.

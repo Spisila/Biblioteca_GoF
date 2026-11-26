@@ -27,6 +27,7 @@ public final class FachadaCirculacao {
     private final FabricaPersistencia fabricaPersistencia;
     private final Relogio relogio;
     private final PublicadorDevolucao publicadorDevolucao;
+    private final Runnable invalidarCacheConsulta;
 
     public FachadaCirculacao(
             FabricaPersistencia fabricaPersistencia,
@@ -38,10 +39,20 @@ public final class FachadaCirculacao {
             FabricaPersistencia fabricaPersistencia,
             Relogio relogio,
             PublicadorDevolucao publicadorDevolucao) {
+        this(fabricaPersistencia, relogio, publicadorDevolucao, () -> { });
+    }
+
+    public FachadaCirculacao(
+            FabricaPersistencia fabricaPersistencia,
+            Relogio relogio,
+            PublicadorDevolucao publicadorDevolucao,
+            Runnable invalidarCacheConsulta) {
         this.fabricaPersistencia = Objects.requireNonNull(
                 fabricaPersistencia, "fabricaPersistencia nao pode ser nula");
         this.relogio = Objects.requireNonNull(relogio, "relogio nao pode ser nulo");
         this.publicadorDevolucao = publicadorDevolucao;
+        this.invalidarCacheConsulta = Objects.requireNonNull(
+                invalidarCacheConsulta, "invalidarCacheConsulta nao pode ser nulo");
     }
 
     public FachadaCirculacao(FabricaPersistencia fabricaPersistencia) {
@@ -57,7 +68,7 @@ public final class FachadaCirculacao {
             String idLivro,
             String idEstudante,
             LocalDate dataReserva) {
-        return emTransacao(repositorios -> {
+        Livro resultado = emTransacao(repositorios -> {
             Livro livro = buscarLivro(repositorios.livros(), idLivro);
             livro.solicitarReserva(idEstudante);
             repositorios.livros().salvar(livro);
@@ -65,6 +76,8 @@ public final class FachadaCirculacao {
                     new Reserva(idReserva, idLivro, idEstudante, dataReserva));
             return livro;
         });
+        invalidarCacheConsulta.run();
+        return resultado;
     }
 
     /**
@@ -85,7 +98,7 @@ public final class FachadaCirculacao {
             String idLivro,
             String idEstudante,
             LocalDate dataEmprestimo) {
-        return emTransacao(repositorios -> {
+        Emprestimo resultado = emTransacao(repositorios -> {
             Livro livro = buscarLivro(repositorios.livros(), idLivro);
             repositorios.relacionamentos().buscarReservaAtiva(idLivro)
                     .orElseThrow(() -> new NaoEncontradoException(
@@ -98,13 +111,15 @@ public final class FachadaCirculacao {
             repositorios.movimentacoes().salvar(emprestimo);
             return emprestimo;
         });
+        invalidarCacheConsulta.run();
+        return resultado;
     }
 
     /**
      * Renova o empréstimo atualmente associado ao livro.
      */
     public Emprestimo registrarRenovacao(String idLivro, String idTransacao) {
-        return emTransacao(repositorios -> {
+        Emprestimo resultado = emTransacao(repositorios -> {
             Livro livro = buscarLivro(repositorios.livros(), idLivro);
             Emprestimo emprestimo = buscarEmprestimo(repositorios.movimentacoes(), idTransacao);
             livro.renovarEmprestimo(emprestimo);
@@ -112,6 +127,8 @@ public final class FachadaCirculacao {
             repositorios.movimentacoes().salvar(emprestimo);
             return emprestimo;
         });
+        invalidarCacheConsulta.run();
+        return resultado;
     }
 
     public Emprestimo renovarEmprestimo(String idLivro, String idTransacao) {
@@ -132,6 +149,7 @@ public final class FachadaCirculacao {
             repositorios.livros().salvar(livro);
             return new DevolucaoConfirmada(livro, emprestimo, dataDevolucao);
         });
+        invalidarCacheConsulta.run();
         if (publicadorDevolucao != null) {
             publicadorDevolucao.publicar(new EventoDevolucao(
                     confirmada.livro(),
