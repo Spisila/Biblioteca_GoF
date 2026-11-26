@@ -80,7 +80,7 @@ emissão da multa. A opção `14` lista o catálogo com os estados atuais dos li
 Para demonstrar o Decorator na CLI, cadastre um livro e use a opção `8`
 ("Consultar livro") duas vezes com o mesmo ID. A primeira consulta mostra
 `[CACHE] MISS`; a segunda mostra `[CACHE] HIT`. Ambas exibem a duração medida
-pela camada externa `[MEDIÇÃO]`. O cache expira após 30 segundos e é invalidado
+pela camada externa `[MEDICAO]`. O cache expira após 30 segundos e é invalidado
 automaticamente após cadastros e movimentações concluídas na aplicação.
 
 Para usar persistência em memória:

@@ -52,7 +52,7 @@ public final class DecoratorMedicao extends DecoratorConsulta {
         totalNanos.addAndGet(duracaoNanos);
         System.out.printf(
                 Locale.ROOT,
-                "[MEDIÇÃO] Consulta executada em %.2f ms%n",
+                "[MEDICAO] Consulta executada em %.2f ms%n",
                 duracaoNanos / 1_000_000.0);
     }
 }

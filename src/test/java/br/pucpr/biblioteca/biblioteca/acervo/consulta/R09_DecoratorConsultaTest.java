@@ -49,7 +49,7 @@ class R09_DecoratorConsultaTest {
 
         assertEquals(1, chamadas.get());
         assertTrue(saida.matches(
-                "(?s).*\\[MEDIÇÃO\\] Consulta executada em \\d+\\.\\d{2} ms\\R"));
+                "(?s).*\\[MEDICAO\\] Consulta executada em \\d+\\.\\d{2} ms\\R"));
         assertEquals(1, medicao.quantidadeConsultas());
         assertTrue(medicao.totalNanos() >= 0);
     }
@@ -66,7 +66,7 @@ class R09_DecoratorConsultaTest {
                 assertSame(falha, assertThrows(
                         RuntimeException.class, () -> medicao.consultarPorId("l1"))));
 
-        assertTrue(saida.contains("[MEDIÇÃO] Consulta executada em "));
+        assertTrue(saida.contains("[MEDICAO] Consulta executada em "));
         assertEquals(1, medicao.quantidadeConsultas());
     }
 
@@ -164,7 +164,7 @@ class R09_DecoratorConsultaTest {
 
         assertEquals(1, chamadas.get());
         assertEquals(2, medicao.quantidadeConsultas());
-        assertEquals(2, ocorrencias(saida, "[MEDIÇÃO] Consulta executada em "));
+        assertEquals(2, ocorrencias(saida, "[MEDICAO] Consulta executada em "));
         assertTrue(saida.contains("[CACHE] HIT"));
     }
 
@@ -197,7 +197,7 @@ class R09_DecoratorConsultaTest {
         assertEquals(2, chamadas.get());
         assertEquals(2, ocorrencias(saida, "[CACHE] MISS"));
         assertEquals(1, ocorrencias(saida, "[CACHE] HIT"));
-        assertEquals(3, ocorrencias(saida, "[MEDIÇÃO] Consulta executada em "));
+        assertEquals(3, ocorrencias(saida, "[MEDICAO] Consulta executada em "));
     }
 
     @Test
